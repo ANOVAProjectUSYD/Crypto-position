@@ -1,2 +1,2 @@
 # Crypto-position
-Python web scraper
+Web scraping module to analyse cryptocurrency position movement.
