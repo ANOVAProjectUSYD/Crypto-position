@@ -11,3 +11,5 @@ Packages I would recommend on installing of the top of my head:
 - request
 
 Remember to use Python3.
+
+Good link for OOD: https://www.tutorialspoint.com/python/python_classes_objects.htm

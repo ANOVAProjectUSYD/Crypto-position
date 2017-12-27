@@ -24,25 +24,47 @@ def parse_site(html):
     bs_Obj = BeautifulSoup(html, "html.parser")
     # Table in which currencies reside.
     table = bs_Obj.find("table", {"id": "currencies"}).find('tbody')
+    currency_list = []
     # Iterate through table entries by row.
     for row in table.find_all('tr'):
         cells = row.find_all("td")
-        # Gets ranking.
-        rn = cells[0].get_text()
-        # Gets name of currency.
-        rn2 = cells[1].get_text()
-        # Gets market cap
-        rn3 = cells[2].get_text()
-        # Gets price
-        rn4 = cells[3].get_text()
-        # Gets change in 24 hours.
-        rn5 = cells[6].get_text()
-        print(rn2)
-    return
+        # Create crypto object.
+        crypto_obj = create_crypto(cells)
+        currency_list.append(crypto_obj)
+    return currency_list
+
+
+class Currency:
+    def __init__(self, name, rank, market_cap, price, price_change):
+        self.name = name
+        self.rank = rank
+        self.market_cap = market_cap
+        self.price = price
+        self.price_change = price_change
+
+
+def create_crypto(cells):
+    '''Create list of currency objects.'''
+    rank = str(cells[0].get_text())
+    name = str(cells[1].get_text())
+    market_cap = str(cells[2].get_text())
+    price = str(cells[3].get_text())
+    price_change = str(cells[6].get_text())
+    return Currency(name, rank, market_cap, price, price_change)
 
 
 def main():
-    parse_site(get_website())
+    listOfStuff = parse_site(get_website())
+    # Whole list.
+    # print(listOfStuff)
+    # # Access first object in list.
+    # print(listOfStuff[0])
+    # # Access the name attribute in first object.
+    # print(listOfStuff[0].name)
+    for x in listOfStuff:
+        print(x.name)
+        print(x.price)
+        print(x.rank)
 
 
 if __name__ == "__main__":
