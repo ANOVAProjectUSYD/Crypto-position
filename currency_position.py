@@ -16,6 +16,7 @@ def read_data(objects):
     '''Takes in list of currency objects and converts it into list of dictionaries.'''
     list_objects = []
     for obj in objects:
+        
         # TODO: Convert list of objects into list of dictionaries for each obj.
 
 
