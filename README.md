@@ -1,15 +1,30 @@
-# Crypto-position
-Web scraping module to analyse cryptocurrency position movement.
+# USYD-Societies-Events
+This project seeks to scrape Cryptocurrency data from [coinmarketcap](https://coinmarketcap.com/) and into a CSV file. Then, we will run some technical analysis on the data. Common trading strategies include momentum, mean reversal, and more.  
 
-# Read this David
-Here, I'm presenting you a list of objects each containing info like we talked about last night. Quite similar to manipulating objects as you would in Java. Here is a good link:
-http://openbookproject.net/thinkcs/python/english3e/classes_and_objects_I.html
+## Requirements
 
-Packages I would recommend on installing of the top of my head:
-- csv
-- Beautifulsoup + bs4
-- request
+All packages used are in the requirements.txt file.
 
-Remember to use Python3.
+### Getting Started
 
-Good link for OOD: https://www.tutorialspoint.com/python/python_classes_objects.htm
+ Files to read in order to follow along with the project.
+
+1) Check out the web_scrape.py file to see how data was scraped.
+
+## Built With
+
+* BeautifulSoup
+
+* Care and Coffee
+
+## Authors
+
+The ANOVA Project - Chris Hyland
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details
+
+## Acknowledgements
+
+* Lots of coffee!
