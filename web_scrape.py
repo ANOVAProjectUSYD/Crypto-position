@@ -55,12 +55,6 @@ def create_crypto(cells):
 
 def main():
     listOfStuff = parse_site(get_website())
-    # Whole list.
-    # print(listOfStuff)
-    # # Access first object in list.
-    # print(listOfStuff[0])
-    # # Access the name attribute in first object.
-    # print(listOfStuff[0].name)
     for x in listOfStuff:
         print(x.name)
         print(x.price)
