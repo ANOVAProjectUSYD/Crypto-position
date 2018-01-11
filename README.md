@@ -1,17 +1,20 @@
 # Cryptocurrency Technical Analysis
-This project seeks to scrape Cryptocurrency data from [coinmarketcap](https://coinmarketcap.com/) and into a CSV file. Then, we will run some technical analysis on the data. Common trading strategies include momentum, mean reversal, and more.  
+This project seeks to scrape Cryptocurrency data from [coinmarketcap](https://coinmarketcap.com/) and into a CSV file. Then, we will run some technical analysis on the data. Common trading strategies include momentum, mean reversal, and more. We would also like to be able to create a visualiation
+dashboard to explore the data. We then would include this on our ANOVA github page.
 
 ## Requirements
 
-All packages used are in the requirements.txt file.
+Python3 is required. All packages used are in the requirements.txt file.
 
 ### Getting Started
 
- Files to read in order to follow along with the project.
+Most likely to use plotly to construct the dashboard: https://plot.ly/
 
-1) Check out the web_scrape.py file to see how data was scraped.
+Examples of good dashboards: https://plot.ly/dash/gallery/uber-rides/
 
-2) csv_converter.py was used to convert ; separated files into csv files for ease of use.
+First let's get this working on our own Jupyter notebooks.
+
+Good tutorial to learn git: https://www.atlassian.com/git/tutorials
 
 ## Built With
 
