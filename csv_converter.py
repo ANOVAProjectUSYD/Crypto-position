@@ -1,4 +1,5 @@
 import csv
+import sys
 
 def openFile(name):
     '''Open file and rewrite as csv file.'''
@@ -24,8 +25,9 @@ def openFile(name):
         print(e)
 
 def main():
-    file_name = input("Enter csv file name: ")
-    openFile(file_name)
+    file_names = sys.argv[1:]
+    for file_name in file_names:
+        openFile(file_name) 
 
 if __name__ == "__main__":
     main()
