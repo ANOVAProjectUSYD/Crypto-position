@@ -16,6 +16,9 @@ First let's get this working on our own Jupyter notebooks.
 
 Good tutorial to learn git: https://www.atlassian.com/git/tutorials
 
+Tutorial used to build with Flask is:http://adilmoujahid.com/posts/2015/01/interactive-data-visualization-d3-dc-python-mongodb/
+
+Code for Flask is inside the project directory.
 ## Built With
 
 * BeautifulSoup
