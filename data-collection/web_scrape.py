@@ -2,6 +2,9 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from urllib.error import HTTPError
 
+############################################################
+############ Scrape data from coinmarketcap website. #######
+############################################################
 
 def get_website():
     '''Ensure call to website is successful.'''

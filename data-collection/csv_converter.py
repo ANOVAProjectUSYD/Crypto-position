@@ -1,6 +1,10 @@
 import csv
 import sys
 
+############################################################
+############ Reformat csv file to the way we want it. ######
+############################################################
+
 def openFile(name):
     '''Open file and rewrite as csv file.'''
     if '.csv' in name:
@@ -27,7 +31,7 @@ def openFile(name):
 def main():
     file_names = sys.argv[1:]
     for file_name in file_names:
-        openFile(file_name) 
+        openFile(file_name)
 
 if __name__ == "__main__":
     main()
