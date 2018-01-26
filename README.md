@@ -87,7 +87,7 @@ _General disclaimer: All of the above measures are entirely subjective and are s
 
 ## Authors
 
-The ANOVA Project - Chris Hyland, Eileen Wang, Alex Oh.
+The ANOVA Project - Chris Hyland, Supavit Dumrongprechachan, Eileen Wang, Alex Oh.
 
 ## License
 
