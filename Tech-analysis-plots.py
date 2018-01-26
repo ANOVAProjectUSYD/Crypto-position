@@ -14,7 +14,7 @@ from scipy import stats
 # In[2]:
 
 def ichimoku_plot(df):
-    '''Computes the Ichimoku Kinkō Hyō trend identification system.'''
+    '''Computes the Ichimoku Kink? Hy? trend identification system.'''
     # This plot has 5 components to it. 
     high_prices = df['High']
     close_prices = df['Close']
