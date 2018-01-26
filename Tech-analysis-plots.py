@@ -3,16 +3,15 @@
 
 # In[1]:
 
-
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from datetime import datetime
+from scipy import stats
 
 
 # In[2]:
-
 
 def ichimoku_plot(df):
     '''Computes the Ichimoku Kinkō Hyō trend identification system.'''
@@ -49,7 +48,6 @@ def ichimoku_plot(df):
 
 # In[3]:
 
-
 def reverse_date(df, remove_date="Yes", ich_plot="Yes"):
     '''Reverses the dataset so it is in chronological order. Optional to remove date column and set as index.'''
     final_data = df.reindex(index=df.index[::-1])
@@ -76,7 +74,6 @@ def reverse_date(df, remove_date="Yes", ich_plot="Yes"):
 
 # In[4]:
 
-
 def compute_metrics(name, data, rf, mar, market):
     '''Computes 4 metrics of the Cryptocurrency and returns Pandas dataframe.'''
     metrics = []
@@ -97,7 +94,6 @@ def compute_metrics(name, data, rf, mar, market):
 
 # In[5]:
 
-
 def scale_volume(dataframe, scale_factor): 
     '''Append a column of volumes scaled down by specified factor'''
     dataframe['Scaled Volume'] = dataframe['Volume']/scale_factor
@@ -106,7 +102,6 @@ def scale_volume(dataframe, scale_factor):
 
 # In[6]:
 
-
 def sma_plot(df, window):
     '''Computes simple moving average.'''
     rolling = df['Close'].rolling(window=window) # Window tells us how many days average to take.
@@ -114,7 +109,6 @@ def sma_plot(df, window):
 
 
 # In[7]:
-
 
 def bollinger_plot(df, window, num_sd):
     '''Computes Bollinger bands depending on number of standard deviation and window.''' 
@@ -129,8 +123,7 @@ def bollinger_plot(df, window, num_sd):
     return bollinger
 
 
-# In[25]:
-
+# In[8]:
 
 import warnings
 warnings.filterwarnings('ignore') # Warnings were getting annoying.
@@ -155,8 +148,7 @@ df_market.reindex(index=df_market.index[::-1])
 df_market['Date'] = pd.to_datetime(df_market['Date'], dayfirst = True) 
 
 
-# In[67]:
-
+# In[9]:
 
 from bokeh.events import ButtonClick
 from bokeh.layouts import column, row, widgetbox
@@ -166,8 +158,7 @@ from bokeh.models import HoverTool, CustomJS, Legend
 from math import pi 
 
 
-# In[ ]:
-
+# In[10]:
 
 '''Constructing top candlestick chart with ichimoku plot'''
 inc = df.Close > df.Open
@@ -262,8 +253,7 @@ bottom_plot.title.text = 'Ripple Chart'
 top_plot.add_layout(legend, 'right')'''
 
 
-# In[69]:
-
+# In[22]:
 
 def calc_returns(df_x, df_y): 
     '''Return data frame consisting of returns for 2 currencies'''
@@ -291,22 +281,35 @@ def calc_returns(df_x, df_y):
     return df_returns
 
 
-# In[70]:
+# In[28]:
+
+def compute_regression(df):
+    '''Computes the multiple metrics from regression of 2 datasets.'''
+    df_x = df_returns_2.x
+    df_y = df_returns_2.y
+    beta, alpha, r_value, p_value, std_err = stats.linregress(df_x, df_y)
+    r2 = r_value**2 # R-squared
+    metrics = [beta, alpha, r_value, r2, p_value, std_err]
+    return metrics
 
 
-''' Construct scatter correlation plot with market index. '''
+# In[31]:
+
+'''Construct scatter correlation plot with market index.'''
 # df_returns = calc_returns(df, df_rip) 
-df_returns_2 = calc_returns(df, df_market)
+df_x = df
+df_y = df_market 
 
-source_corr = ColumnDataSource(data = df_returns_2)
+df_returns_2 = calc_returns(df_x, df_y)
+metrics = compute_regression(df_returns_2)
+sourceCorr = ColumnDataSource(data = df_returns_2)
 corr_plot = figure(plot_width=400, plot_height=350,
              tools='pan,wheel_zoom,box_select,reset', title = "Bitcoin vs. Crix Returns")
-corr_plot.circle('x', 'y', size=2, source=source_corr,
+corr_plot.circle('x', 'y', size=2, source=sourceCorr,
             selection_color="orange", alpha=0.6, nonselection_alpha=0.1, selection_alpha=0.4)
 
 
-# In[ ]:
-
+# In[18]:
 
 #Adding button widgets
 button_3m = Button(label= "3 month", width = 80)
@@ -361,78 +364,99 @@ button_ytd.on_click(update_ytd)
 button_all.on_click(update_all)
 
 
-# In[ ]:
-
+# In[30]:
 
 #Create dropdown widgets 
-DEFAULT_TICKERS = ['Bitcoin', 'Ripple', 'Ethereum']
+DEFAULT_TICKERS = ['Bitcoin', 'Ripple', 'Ethereum', 'Crix']
 
 def nix(val, lst):
     '''Remove currently selected currency from dropdown list'''
     return [x for x in lst if x != val]
 
-dropdown_top = Select(value = "Bitcoin", options=nix('Ripple', DEFAULT_TICKERS))
-dropdown_bottom = Select(value = "Ripple", options=nix('Bitcoin', DEFAULT_TICKERS))
+dropdown_top = Select(value = "Bitcoin", options=nix('Crix', DEFAULT_TICKERS))
+dropdown_bottom = Select(value = "Crix", options=nix('Bitcoin', DEFAULT_TICKERS))
 
-def update_source(df, plot, top = True): 
-    '''Update the source for the top candle + ichimoku plot'''
-    inc = df.Close > df.Open
-    dec = df.Open > df.Close
-    newSourceInc = ColumnDataSource(ColumnDataSource.from_df(df.loc[inc]))
-    newSourceDec = ColumnDataSource(ColumnDataSource.from_df(df.loc[dec]))
-    newSource = ColumnDataSource(data = df)
-    
-    if top == True: 
+def update_top_source(df, market = False): 
+    '''Update source for top plot and x data for correlation plot'''
+    global df_x, df_y, r7 
+
+    if market == False:  #Don't create ichimoku plots for CRIX data 
+        top_plot.renderers.remove(r7)
+        r7 = fill_area(top_plot, df)
+
+        inc = df.Close > df.Open
+        dec = df.Open > df.Close
+        newSourceInc = ColumnDataSource(ColumnDataSource.from_df(df.loc[inc]))
+        newSourceDec = ColumnDataSource(ColumnDataSource.from_df(df.loc[dec]))
+        newSource = ColumnDataSource(data = df)
+
         sourceInc_top.data.update(newSourceInc.data)
         sourceDec_top.data.update(newSourceDec.data)
         source_top.data.update(newSource.data)
-    else: 
+
+        top_plot.title.text = '%s Chart' % (dropdown_top.value)
+
+    df_x = df 
+    new_returns = calc_returns(df_x, df_y)
+    new_sourceCorr = new_returns 
+    sourceCorr.data.update(new_sourceCorr)
+    corr_plot.title.text = '%s vs. %s Returns' % (dropdown_top.value, dropdown_bottom.value)
+
+def update_bottom_source(df, market = False):
+    '''Update source for bottom plot and y data for correlation plot'''
+    global df_x, df_y, r8
+
+    if market == False: #Don't create ichimoku plots for CRIX data 
+        bottom_plot.renderers.remove(r8)
+        r8 = fill_area(bottom_plot, df)
+
+        inc = df.Close > df.Open
+        dec = df.Open > df.Close
+        newSourceInc = ColumnDataSource(ColumnDataSource.from_df(df.loc[inc]))
+        newSourceDec = ColumnDataSource(ColumnDataSource.from_df(df.loc[dec]))
+        newSource = ColumnDataSource(data = df)
+
         sourceInc_bottom.data.update(newSourceInc.data)
         sourceDec_bottom.data.update(newSourceDec.data)
         source_bottom.data.update(newSource.data)
-        
+
+        bottom_plot.title.text = '%s Chart' % (dropdown_bottom.value)
+
+    df_y = df
+    new_returns = calc_returns(df_x, df_y)
+    new_sourceCorr = new_returns 
+    sourceCorr.data.update(new_sourceCorr)
+    corr_plot.title.text = '%s vs. %s Returns' % (dropdown_top.value, dropdown_bottom.value)
+
 def update_top_plot(attrname, old, new):
     '''Update top plot to selected data set''' 
-    dropdown_bottom.options = nix(new, DEFAULT_TICKERS)
-    top_plot.title.text = '%s Chart' % (dropdown_top.value)
-    
-    global r7
-    top_plot.renderers.remove(r7)
-
+    dropdown_bottom.options = nix(new, DEFAULT_TICKERS)    
+    if dropdown_top.value == 'Crix':
+        update_top_source(df_market, True)
     if dropdown_top.value == 'Ripple':
-        update_source(df_rip, top_plot)
-        r7 = fill_area(top_plot, df_rip)
+        update_top_source(df_rip)
     if dropdown_top.value == 'Bitcoin':
-        update_source(df, top_plot)
-        r7 = fill_area(top_plot, df)
+        update_top_source(df)
     if dropdown_top.value == 'Ethereum':
-        update_source(df_eth, top_plot)
-        r7 = fill_area(top_plot, df_eth)
+        update_top_source(df_eth)
 
 def update_bottom_plot(attrname, old, new):
     '''Update bottom plot to selected data set'''
     dropdown_top.options = nix(new, DEFAULT_TICKERS)
-    bottom_plot.title.text = '%s Chart' % (dropdown_bottom.value)
-    
-    global r8
-    bottom_plot.renderers.remove(r8)
-
+    if dropdown_bottom.value == 'Crix': 
+        update_bottom_source(df_market, True)
     if dropdown_bottom.value == 'Ripple':
-        update_source(df_rip, bottom_plot, False)
-        r8 = fill_area(bottom_plot, df_rip)
+        update_bottom_source(df_rip)
     if dropdown_bottom.value == 'Bitcoin':
-        update_source(df, bottom_plot, False)
-        r8 = fill_area(bottom_plot, df)
+        update_bottom_source(df)
     if dropdown_bottom.value == 'Ethereum':
-        update_source(df_eth, bottom_plot, False)
-        r8 = fill_area(bottom_plot, df_eth)
+        update_bottom_source(df_eth)
 
 dropdown_top.on_change('value', update_top_plot)
 dropdown_bottom.on_change('value', update_bottom_plot)
 
 
 # In[ ]:
-
 
 #Format layout and display plot
 button_controls = row([button_3m, button_6m, button_1y, button_ytd, button_all])
