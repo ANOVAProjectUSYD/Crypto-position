@@ -6,6 +6,10 @@ We used the cryptocurrency index Crix as the market: http://crix.hu-berlin.de/
 
 Python3 is required. All packages used are in the requirements.txt file.
 
+If you are using Mac OSX and a virtualenv, the files for Bokeh plots will not run due to Matplotlib's backend not playing nicely. Instead, we need to use venv, which is same thing as a virtualenv except it only works for Python3, which is fine since that's the only language we support. https://docs.python.org/3/library/venv.html
+From that, just run venv as you would normally would for the virtual environment. 
+
+To run the Bokeh code on their servers, just go: bokeh serve --show Tech-analysis.plots.py
 ### Getting Started
 
 Most likely to use plotly to construct the dashboard: https://plot.ly/
