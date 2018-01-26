@@ -7,7 +7,7 @@ We used the cryptocurrency index Crix as the market: http://crix.hu-berlin.de/
 Python3 is required. All packages used are in the requirements.txt file.
 
 If you are using Mac OSX and a virtualenv, the files for Bokeh plots will not run due to Matplotlib's backend not playing nicely. Instead, we need to use venv, which is same thing as a virtualenv except it only works for Python3, which is fine since that's the only language we support. https://docs.python.org/3/library/venv.html
-From that, just run venv as you would normally would for the virtual environment. 
+From that, just run venv as you would normally would for the virtual environment.
 
 To run the Bokeh code on their servers, just go: bokeh serve --show Tech-analysis.plots.py
 ### Getting Started
@@ -34,7 +34,7 @@ Installation: The easiest way to install is either by __homebrew__ or http://pos
 
 Command Line Tools: Both options above come with the command line tools. Just be sure to include the bin in your PATH.
 
-Creating your local db: 
+Creating your local db:
 ```
 mkdir /usr/local/var/postgres
 initdb
@@ -50,7 +50,7 @@ From this point, you can play around now. For more references, you can include `
 
 ### Flask + SQLAlchemy + PostgreSQL
 
-Install __autoenv__ or similar tools if haven't already: This is particularly useful for development since we often deal with enviroments. They can automatically switch your virtual environment and define environment variables. 
+Install __autoenv__ or similar tools if haven't already: This is particularly useful for development since we often deal with enviroments. They can automatically switch your virtual environment and define environment variables.
 
 Run Flask App via `flask run`. However, we need to set the `FLASK_APP` environment variable to the flask app file which is `app.py` in this case.
 
@@ -62,7 +62,7 @@ __Migration Repository__: This is a directory that stores scripts that are creat
 - `flask db upgrade`: Apply the changes
 - `flask db downgrade`: Undo the last migration.
 
-Playing with SQLAlchemy: The documentation is really useful and clear http://flask-sqlalchemy.pocoo.org/2.3/. Also, we can use `flask shell` which is similar to python shell but we can pre-import objects from the app file. 
+Playing with SQLAlchemy: The documentation is really useful and clear http://flask-sqlalchemy.pocoo.org/2.3/. Also, we can use `flask shell` which is similar to python shell but we can pre-import objects from the app file.
 
 
 ## Metrics used
@@ -87,7 +87,7 @@ _General disclaimer: All of the above measures are entirely subjective and are s
 
 ## Authors
 
-The ANOVA Project - Chris Hyland, Supavit Dumrongprechachan, Eileen Wang, Alex Oh.
+The ANOVA Project - Eileen Wang, Supavit Dumrongprechachan, Chris Hyland, Alex Oh.
 
 ## License
 
