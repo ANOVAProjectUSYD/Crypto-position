@@ -1,8 +1,7 @@
 
 # coding: utf-8
 
-# In[19]:
-
+# In[83]:
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,11 +11,10 @@ from datetime import datetime
 from scipy import stats
 
 
-# In[20]:
-
+# In[84]:
 
 def ichimoku_plot(df):
-    '''Computes the Ichimoku Kinkō Hyō trend identification system.'''
+    '''Computes the Ichimoku Kink? Hy? trend identification system.'''
     # This plot has 5 components to it. 
     high_prices = df['High']
     close_prices = df['Close']
@@ -48,8 +46,7 @@ def ichimoku_plot(df):
     return df[df.columns[6:]]
 
 
-# In[21]:
-
+# In[85]:
 
 def reverse_date(df, remove_date="Yes", ich_plot="Yes"):
     '''Reverses the dataset so it is in chronological order. Optional to remove date column and set as index.'''
@@ -75,8 +72,7 @@ def reverse_date(df, remove_date="Yes", ich_plot="Yes"):
     return final_data
 
 
-# In[22]:
-
+# In[86]:
 
 def compute_metrics(name, data, rf, mar, market):
     '''Computes 4 metrics of the Cryptocurrency and returns Pandas dataframe.'''
@@ -96,8 +92,7 @@ def compute_metrics(name, data, rf, mar, market):
     return results
 
 
-# In[23]:
-
+# In[87]:
 
 def scale_volume(dataframe, scale_factor): 
     '''Append a column of volumes scaled down by specified factor'''
@@ -105,8 +100,7 @@ def scale_volume(dataframe, scale_factor):
     return dataframe 
 
 
-# In[24]:
-
+# In[88]:
 
 def sma_plot(df, window):
     '''Computes simple moving average.'''
@@ -114,8 +108,7 @@ def sma_plot(df, window):
     return rolling.mean()
 
 
-# In[25]:
-
+# In[89]:
 
 def bollinger_plot(df, window, num_sd):
     '''Computes Bollinger bands depending on number of standard deviation and window.''' 
@@ -130,8 +123,7 @@ def bollinger_plot(df, window, num_sd):
     return bollinger
 
 
-# In[26]:
-
+# In[90]:
 
 import warnings
 warnings.filterwarnings('ignore') # Warnings were getting annoying.
@@ -156,8 +148,7 @@ df_market.reindex(index=df_market.index[::-1])
 df_market['Date'] = pd.to_datetime(df_market['Date'], dayfirst = True) 
 
 
-# In[27]:
-
+# In[91]:
 
 from bokeh.events import ButtonClick
 from bokeh.layouts import column, row, widgetbox
@@ -169,8 +160,7 @@ from bokeh.io import output_file, show
 from math import pi 
 
 
-# In[28]:
-
+# In[92]:
 
 '''Constructing top candlestick chart with ichimoku plot.'''
 inc = df.Close > df.Open
@@ -266,8 +256,7 @@ bottom_plot.title.text = 'Ripple Chart'
 top_plot.add_layout(legend, 'right')'''
 
 
-# In[29]:
-
+# In[93]:
 
 def calc_returns(df_x, df_y): 
     '''Return data frame consisting of returns for 2 currencies.'''
@@ -295,21 +284,19 @@ def calc_returns(df_x, df_y):
     return df_returns
 
 
-# In[30]:
-
+# In[94]:
 
 def compute_regression(df):
     '''Computes the multiple metrics from regression of 2 datasets.'''
-    df_x = df_returns_2.x
-    df_y = df_returns_2.y
+    df_x = df['x']
+    df_y = df['y']
     beta, alpha, r_value, p_value, std_err = stats.linregress(df_x, df_y)
     r2 = r_value**2 # R-squared.
     metrics = [beta, alpha, r_value, r2, p_value, std_err]
     return metrics
 
 
-# In[31]:
-
+# In[95]:
 
 '''Construct scatter correlation plot with market index.'''
 df_x = df
@@ -323,8 +310,7 @@ corr_plot.circle('x', 'y', size=2, source=sourceCorr,
             selection_color="orange", alpha=0.6, nonselection_alpha=0.1, selection_alpha=0.4)
 
 
-# In[32]:
-
+# In[100]:
 
 '''Creates data-table of correlation.'''
 metrics = compute_regression(df_returns_2)
@@ -339,8 +325,7 @@ columns_table = [
 data_table = DataTable(source=reg_source, columns=columns_table, width=400, height=280)
 
 
-# In[33]:
-
+# In[97]:
 
 #Adding button widgets
 button_3m = Button(label= "3 month", width = 80)
@@ -395,8 +380,7 @@ button_ytd.on_click(update_ytd)
 button_all.on_click(update_all)
 
 
-# In[34]:
-
+# In[98]:
 
 # Create dropdown widgets. 
 DEFAULT_TICKERS = ['Bitcoin', 'Ripple', 'Ethereum', 'Crix']
@@ -433,6 +417,7 @@ def update_top_source(df, market = False):
     new_returns = calc_returns(df_x, df_y) 
     new_sourceCorr = new_returns 
     sourceCorr.data.update(new_sourceCorr)
+    
     # Update correlation metrics.
     new_reg_metrics = compute_regression(new_returns)
     new_reg_data = dict(metrics=["Beta", "P-value of Beta", "Alpha", "Correlation", "R-squared"],
@@ -443,7 +428,6 @@ def update_top_source(df, market = False):
     reg_source.data.update(new_reg_sourceCorr) 
     
     corr_plot.title.text = '%s vs. %s Returns' % (dropdown_top.value, dropdown_bottom.value)
-
 
 def update_bottom_source(df, market = False):
     '''Update source for bottom plot and y data for correlation plot.'''
@@ -479,9 +463,8 @@ def update_bottom_source(df, market = False):
     new_reg_sourceCorr = new_reg_data
     reg_source.data.update(new_reg_sourceCorr) 
     
-    
     corr_plot.title.text = '%s vs. %s Returns' % (dropdown_top.value, dropdown_bottom.value)
-
+    
 def update_top_plot(attrname, old, new):
     '''Update top plot to selected data set''' 
     dropdown_bottom.options = nix(new, DEFAULT_TICKERS)    
@@ -510,8 +493,7 @@ dropdown_top.on_change('value', update_top_plot)
 dropdown_bottom.on_change('value', update_bottom_plot)
 
 
-# In[38]:
-
+# In[99]:
 
 #Format layout and display plot
 button_controls = row([button_3m, button_6m, button_1y, button_ytd, button_all])
@@ -522,4 +504,9 @@ output_file("dashboard.html", title="dashboard.py")
 layout = column(dropdown_controls, widgetbox(data_table), price_plots)
 curdoc().add_root(layout)
 show(layout)
+
+
+# In[ ]:
+
+
 
