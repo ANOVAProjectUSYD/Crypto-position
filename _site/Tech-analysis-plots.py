@@ -1,8 +1,7 @@
 
 # coding: utf-8
 
-# In[2]:
-
+# In[83]:
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,11 +11,10 @@ from datetime import datetime
 from scipy import stats
 
 
-# In[3]:
-
+# In[84]:
 
 def ichimoku_plot(df):
-    '''Computes the Ichimoku Kinkō Hyō trend identification system.'''
+    '''Computes the Ichimoku Kink? Hy? trend identification system.'''
     # This plot has 5 components to it. 
     high_prices = df['High']
     close_prices = df['Close']
@@ -48,8 +46,7 @@ def ichimoku_plot(df):
     return df[df.columns[6:]]
 
 
-# In[4]:
-
+# In[85]:
 
 def reverse_date(df, remove_date="Yes", ich_plot="Yes"):
     '''Reverses the dataset so it is in chronological order. Optional to remove date column and set as index.'''
@@ -75,8 +72,7 @@ def reverse_date(df, remove_date="Yes", ich_plot="Yes"):
     return final_data
 
 
-# In[5]:
-
+# In[86]:
 
 def compute_metrics(name, data, rf, mar, market):
     '''Computes 4 metrics of the Cryptocurrency and returns Pandas dataframe.'''
@@ -96,8 +92,7 @@ def compute_metrics(name, data, rf, mar, market):
     return results
 
 
-# In[6]:
-
+# In[87]:
 
 def scale_volume(dataframe, scale_factor): 
     '''Append a column of volumes scaled down by specified factor'''
@@ -105,8 +100,7 @@ def scale_volume(dataframe, scale_factor):
     return dataframe 
 
 
-# In[7]:
-
+# In[88]:
 
 def sma_plot(df, window):
     '''Computes simple moving average.'''
@@ -114,8 +108,7 @@ def sma_plot(df, window):
     return rolling.mean()
 
 
-# In[8]:
-
+# In[89]:
 
 def bollinger_plot(df, window, num_sd):
     '''Computes Bollinger bands depending on number of standard deviation and window.''' 
@@ -130,8 +123,7 @@ def bollinger_plot(df, window, num_sd):
     return bollinger
 
 
-# In[9]:
-
+# In[90]:
 
 import warnings
 warnings.filterwarnings('ignore') # Warnings were getting annoying.
@@ -156,8 +148,7 @@ df_market.reindex(index=df_market.index[::-1])
 df_market['Date'] = pd.to_datetime(df_market['Date'], dayfirst = True) 
 
 
-# In[10]:
-
+# In[91]:
 
 from bokeh.events import ButtonClick
 from bokeh.layouts import column, row, widgetbox
@@ -169,8 +160,7 @@ from bokeh.io import output_file, show
 from math import pi 
 
 
-# In[11]:
-
+# In[92]:
 
 '''Constructing top candlestick chart with ichimoku plot.'''
 inc = df.Close > df.Open
@@ -266,8 +256,7 @@ bottom_plot.title.text = 'Ripple Chart'
 top_plot.add_layout(legend, 'right')'''
 
 
-# In[12]:
-
+# In[93]:
 
 def calc_returns(df_x, df_y): 
     '''Return data frame consisting of returns for 2 currencies.'''
@@ -295,8 +284,7 @@ def calc_returns(df_x, df_y):
     return df_returns
 
 
-# In[21]:
-
+# In[94]:
 
 def compute_regression(df):
     '''Computes the multiple metrics from regression of 2 datasets.'''
@@ -305,12 +293,10 @@ def compute_regression(df):
     beta, alpha, r_value, p_value, std_err = stats.linregress(df_x, df_y)
     r2 = r_value**2 # R-squared.
     metrics = [beta, alpha, r_value, r2, p_value, std_err]
-    final_metrics = np.around(metrics, decimals=5) # To get 2 DP.
-    return final_metrics
+    return metrics
 
 
-# In[22]:
-
+# In[95]:
 
 '''Construct scatter correlation plot with market index.'''
 df_x = df
@@ -324,8 +310,7 @@ corr_plot.circle('x', 'y', size=2, source=sourceCorr,
             selection_color="orange", alpha=0.6, nonselection_alpha=0.1, selection_alpha=0.4)
 
 
-# In[23]:
-
+# In[100]:
 
 '''Creates data-table of correlation.'''
 metrics = compute_regression(df_returns_2)
@@ -340,10 +325,9 @@ columns_table = [
 data_table = DataTable(source=reg_source, columns=columns_table, width=400, height=280)
 
 
-# In[24]:
+# In[97]:
 
-
-# Adding button widgets.
+#Adding button widgets
 button_3m = Button(label= "3 month", width = 80)
 button_6m = Button(label = "6 month", width = 80)
 button_1y = Button(label = "1 Year", width = 80)
@@ -396,8 +380,7 @@ button_ytd.on_click(update_ytd)
 button_all.on_click(update_all)
 
 
-# In[25]:
-
+# In[98]:
 
 # Create dropdown widgets. 
 DEFAULT_TICKERS = ['Bitcoin', 'Ripple', 'Ethereum', 'Crix']
@@ -510,8 +493,7 @@ dropdown_top.on_change('value', update_top_plot)
 dropdown_bottom.on_change('value', update_bottom_plot)
 
 
-# In[26]:
-
+# In[99]:
 
 #Format layout and display plot
 button_controls = row([button_3m, button_6m, button_1y, button_ytd, button_all])
@@ -522,4 +504,9 @@ output_file("dashboard.html", title="dashboard.py")
 layout = column(dropdown_controls, widgetbox(data_table), price_plots)
 curdoc().add_root(layout)
 show(layout)
+
+
+# In[ ]:
+
+
 
