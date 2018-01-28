@@ -1,8 +1,7 @@
 
 # coding: utf-8
 
-# In[2]:
-
+# In[1]:
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,11 +11,10 @@ from datetime import datetime
 from scipy import stats
 
 
-# In[3]:
-
+# In[2]:
 
 def ichimoku_plot(df):
-    '''Computes the Ichimoku Kinkō Hyō trend identification system.'''
+    '''Computes the Ichimoku Kink? Hy? trend identification system.'''
     # This plot has 5 components to it. 
     high_prices = df['High']
     close_prices = df['Close']
@@ -48,8 +46,7 @@ def ichimoku_plot(df):
     return df[df.columns[6:]]
 
 
-# In[4]:
-
+# In[3]:
 
 def reverse_date(df, remove_date="Yes", ich_plot="Yes"):
     '''Reverses the dataset so it is in chronological order. Optional to remove date column and set as index.'''
@@ -75,8 +72,7 @@ def reverse_date(df, remove_date="Yes", ich_plot="Yes"):
     return final_data
 
 
-# In[5]:
-
+# In[4]:
 
 def compute_metrics(name, data, rf, mar, market):
     '''Computes 4 metrics of the Cryptocurrency and returns Pandas dataframe.'''
@@ -96,8 +92,7 @@ def compute_metrics(name, data, rf, mar, market):
     return results
 
 
-# In[6]:
-
+# In[5]:
 
 def scale_volume(dataframe, scale_factor): 
     '''Append a column of volumes scaled down by specified factor'''
@@ -105,8 +100,7 @@ def scale_volume(dataframe, scale_factor):
     return dataframe 
 
 
-# In[7]:
-
+# In[6]:
 
 def sma_plot(df, window):
     '''Computes simple moving average.'''
@@ -114,8 +108,7 @@ def sma_plot(df, window):
     return rolling.mean()
 
 
-# In[8]:
-
+# In[7]:
 
 def bollinger_plot(df, window, num_sd):
     '''Computes Bollinger bands depending on number of standard deviation and window.''' 
@@ -130,8 +123,7 @@ def bollinger_plot(df, window, num_sd):
     return bollinger
 
 
-# In[9]:
-
+# In[8]:
 
 import warnings
 warnings.filterwarnings('ignore') # Warnings were getting annoying.
@@ -156,8 +148,7 @@ df_market.reindex(index=df_market.index[::-1])
 df_market['Date'] = pd.to_datetime(df_market['Date'], dayfirst = True) 
 
 
-# In[10]:
-
+# In[9]:
 
 from bokeh.events import ButtonClick
 from bokeh.layouts import column, row, widgetbox
@@ -169,8 +160,7 @@ from bokeh.io import output_file, show
 from math import pi 
 
 
-# In[11]:
-
+# In[10]:
 
 '''Constructing top candlestick chart with ichimoku plot.'''
 inc = df.Close > df.Open
@@ -192,31 +182,41 @@ def make_plot(sourceInc, sourceDec, source, df):
     # Display last 6 months by default.
     df_6m = df.iloc[-180:,]['Date']
 
-    TOOLS = "pan, wheel_zoom, xbox_select, reset, save, hover"
+    TOOLS = "pan, wheel_zoom, xbox_select, reset, save"
     p = figure(x_axis_type = "datetime", tools = TOOLS,
                plot_width = 1000, plot_height = 400, x_range = (df_6m.min(), df_6m.max()), active_drag = "xbox_select") 
     p.xaxis.major_label_orientation = pi/4
     p.grid.grid_line_alpha = 0.30 
 
     # Construct increasing and decreasing lines.
-    p.segment('Date', 'High', 'Date', 'Low', color="#17BECF", source = sourceInc)
-    p.segment('Date', 'High', 'Date', 'Low', color="#FF7777", source = sourceDec)
+    seg1 = p.segment('Date', 'High', 'Date', 'Low', color="#17BECF", source = sourceInc)
+    seg2 = p.segment('Date', 'High', 'Date', 'Low', color="#FF7777", source = sourceDec)
 
     # Construct increasing and decreasing bars. 
-    p.vbar('Date', w, 'Open', 'Close', fill_color="#17BECF", line_color="#17BECF", source = sourceInc)
-    p.vbar('Date', w, 'Open', 'Close', fill_color="#FF7777", line_color="#FF7777", source = sourceDec)
+    bar1 = p.vbar('Date', w, 'Open', 'Close', fill_color="#17BECF", line_color="#17BECF", source = sourceInc)
+    bar2 = p.vbar('Date', w, 'Open', 'Close', fill_color="#FF7777", line_color="#FF7777", source = sourceDec)
 
-
-    #Constructing hover tool for candle plot. Currently not working. TODO: fix this 
-    #hover = p.select(dict(type=HoverTool))
-    #hover.mode = "vline"
-    '''hover.tooltips = [("Date", "@Date{%F}"),
-                      ("Open", "@Open{0.2f}"), 
-                      ("High", "@High{0.2f}"), 
-                      ("Low", "@Low{0.2f}"), 
-                      ("Close", "@Close{0.2f}")
-                      ("Volume", "@Volume"]'''
-    #hover.formatters = {'Date' : 'datetime'}
+    #Adding hover tool feature.
+    hover = HoverTool(
+        renderers = [seg1, seg2, bar1, bar2],
+        tooltips = [
+           ('Date', '@Date{%F}'),
+           ('Open', '$@Open{%0.2f}'),
+           ('High', '$@High{%0.2f}'),
+           ('Low', '$@Low{%0.2f}'),
+           ('Close', '$@Close{%0.2f}'),
+           ('Volume', '@Volume{0.00 a}'),
+        ],
+        formatters = {
+            'Date' : 'datetime',
+            'Open' : 'printf',
+            'High' : 'printf',
+            'Low' : 'printf',
+            'Close': 'printf',
+        },
+        mode = 'vline'
+    )
+    p.add_tools(hover)
 
     # Add line render to display ichimoku plot.
     r1 = p.line('Date', 'tenkan_sen', line_width = 1, color = "#92FFB4", source = source)
@@ -232,20 +232,47 @@ def make_plot(sourceInc, sourceDec, source, df):
 
 def fill_area(p, df):  
     '''Fill area between senkou span A and B.'''
-    # TODO: colour red if B above A'
     index = 0
     index_a = np.argwhere(np.isnan(df['senkou_span_a'].values)).max()
     index_b = np.argwhere(np.isnan(df['senkou_span_b'].values)).max()
     if index_b > index_a: 
-        index = index_b
+        index = index_b + 1
     else:
-        index = index_a 
+        index = index_a + 1
     dates = df['Date'].values[index:]
     senkou_span_a = df['senkou_span_a'].values[index:]
     senkou_span_b = df['senkou_span_b'].values[index:]
-    band_y = np.append(senkou_span_a, senkou_span_b[::-1])
-    band_x = np.append(dates, dates[::-1])
-    return p.patch(band_x, band_y, color='#8EF3DA', fill_alpha = 0.20)
+    
+    color = '#98D4FD' #set colour to initially blue.
+    if senkou_span_a[index] < senkou_span_b[index]: 
+        color = '#F7B0B6' #change colour to red. 
+        
+    xs_blue, ys_blue, xs_red, ys_red = [], [], [], [] 
+    
+    for i in range(0, len(senkou_span_a)): 
+        if color == '#98D4FD' and senkou_span_b[i] > senkou_span_a[i] or i == len(senkou_span_a) - 1: 
+            line_a  = senkou_span_a[index:i+1]
+            line_b = senkou_span_b[index:i+1]
+            line_date = dates[index:i+1]
+            index = i 
+            color = '#F7B0B6' #need to change colour to red. 
+            xs_blue.append(np.append(line_date, line_date[::-1]))
+            ys_blue.append(np.append(line_a, line_b[::-1]))
+        elif color == '#F7B0B6' and senkou_span_a[i] >= senkou_span_b[i] or i == len(senkou_span_a) - 1: 
+            line_a  = senkou_span_a[index:i+1]
+            line_b = senkou_span_b[index:i+1]
+            line_date = dates[index:i+1]
+            index = i 
+            color = '#98D4FD' #need to change colour to blue. 
+            xs_red.append(np.append(line_date, line_date[::-1]))
+            ys_red.append(np.append(line_a, line_b[::-1]))
+  
+    patch_renders = []
+    patch_renders.append(p.patches(xs_blue, ys_blue, color='#98D4FD', line_color = '#98D4FD', fill_alpha = 0.20))
+    patch_renders.append(p.patches(xs_red, ys_red, color='#F7B0B6', line_color = '#F7B0B6', fill_alpha = 0.20))
+    
+    return patch_renders
+
 
 top_plot = make_plot(sourceInc_top, sourceDec_top, source_top, df)
 r7 = fill_area(top_plot, df)
@@ -266,8 +293,7 @@ bottom_plot.title.text = 'Ripple Chart'
 top_plot.add_layout(legend, 'right')'''
 
 
-# In[12]:
-
+# In[18]:
 
 def calc_returns(df_x, df_y): 
     '''Return data frame consisting of returns for 2 currencies.'''
@@ -295,8 +321,7 @@ def calc_returns(df_x, df_y):
     return df_returns
 
 
-# In[21]:
-
+# In[19]:
 
 def compute_regression(df):
     '''Computes the multiple metrics from regression of 2 datasets.'''
@@ -309,8 +334,7 @@ def compute_regression(df):
     return final_metrics
 
 
-# In[22]:
-
+# In[20]:
 
 '''Construct scatter correlation plot with market index.'''
 df_x = df
@@ -324,8 +348,7 @@ corr_plot.circle('x', 'y', size=2, source=sourceCorr,
             selection_color="orange", alpha=0.6, nonselection_alpha=0.1, selection_alpha=0.4)
 
 
-# In[23]:
-
+# In[21]:
 
 '''Creates data-table of correlation.'''
 metrics = compute_regression(df_returns_2)
@@ -340,10 +363,9 @@ columns_table = [
 data_table = DataTable(source=reg_source, columns=columns_table, width=400, height=280)
 
 
-# In[24]:
+# In[22]:
 
-
-# Adding button widgets.
+#Adding button widgets
 button_3m = Button(label= "3 month", width = 80)
 button_6m = Button(label = "6 month", width = 80)
 button_1y = Button(label = "1 Year", width = 80)
@@ -396,8 +418,7 @@ button_ytd.on_click(update_ytd)
 button_all.on_click(update_all)
 
 
-# In[25]:
-
+# In[23]:
 
 # Create dropdown widgets. 
 DEFAULT_TICKERS = ['Bitcoin', 'Ripple', 'Ethereum', 'Crix']
@@ -414,7 +435,8 @@ def update_top_source(df, market = False):
     global df_x, df_y, r7 
 
     if market == False:  # Don't create ichimoku plots for CRIX data.
-        top_plot.renderers.remove(r7)
+        top_plot.renderers.remove(r7[0])
+        top_plot.renderers.remove(r7[1])
         r7 = fill_area(top_plot, df)
 
         inc = df.Close > df.Open
@@ -451,7 +473,8 @@ def update_bottom_source(df, market = False):
     global df_x, df_y, r8
 
     if market == False: #Don't create ichimoku plots for CRIX data.
-        bottom_plot.renderers.remove(r8)
+        bottom_plot.renderers.remove(r8[0])
+        bottom_plot.renderers.remove(r8[1])
         r8 = fill_area(bottom_plot, df)
 
         inc = df.Close > df.Open
@@ -510,8 +533,7 @@ dropdown_top.on_change('value', update_top_plot)
 dropdown_bottom.on_change('value', update_bottom_plot)
 
 
-# In[26]:
-
+# In[24]:
 
 #Format layout and display plot
 button_controls = row([button_3m, button_6m, button_1y, button_ytd, button_all])
