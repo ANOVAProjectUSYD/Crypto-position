@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[124]:
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,7 +11,7 @@ from datetime import datetime
 from scipy import stats
 
 
-# In[2]:
+# In[125]:
 
 def ichimoku_plot(df):
     '''Computes the Ichimoku Kink? Hy? trend identification system.'''
@@ -46,7 +46,7 @@ def ichimoku_plot(df):
     return df[df.columns[6:]]
 
 
-# In[3]:
+# In[126]:
 
 def reverse_date(df, remove_date="Yes", ich_plot="Yes"):
     '''Reverses the dataset so it is in chronological order. Optional to remove date column and set as index.'''
@@ -72,7 +72,7 @@ def reverse_date(df, remove_date="Yes", ich_plot="Yes"):
     return final_data
 
 
-# In[4]:
+# In[127]:
 
 def compute_metrics(name, data, rf, mar, market):
     '''Computes 4 metrics of the Cryptocurrency and returns Pandas dataframe.'''
@@ -92,7 +92,7 @@ def compute_metrics(name, data, rf, mar, market):
     return results
 
 
-# In[5]:
+# In[128]:
 
 def scale_volume(dataframe, scale_factor): 
     '''Append a column of volumes scaled down by specified factor'''
@@ -100,7 +100,7 @@ def scale_volume(dataframe, scale_factor):
     return dataframe 
 
 
-# In[6]:
+# In[129]:
 
 def sma_plot(df, window):
     '''Computes simple moving average.'''
@@ -108,7 +108,7 @@ def sma_plot(df, window):
     return rolling.mean()
 
 
-# In[7]:
+# In[130]:
 
 def bollinger_plot(df, window, num_sd):
     '''Computes Bollinger bands depending on number of standard deviation and window.''' 
@@ -123,7 +123,7 @@ def bollinger_plot(df, window, num_sd):
     return bollinger
 
 
-# In[8]:
+# In[131]:
 
 import warnings
 warnings.filterwarnings('ignore') # Warnings were getting annoying.
@@ -148,11 +148,11 @@ df_market.reindex(index=df_market.index[::-1])
 df_market['Date'] = pd.to_datetime(df_market['Date'], dayfirst = True) 
 
 
-# In[9]:
+# In[132]:
 
 from bokeh.events import ButtonClick
-from bokeh.layouts import column, row, widgetbox
-from bokeh.models.widgets import Button, Select
+from bokeh.layouts import column, row, widgetbox, Spacer
+from bokeh.models.widgets import Button, Select, CheckboxButtonGroup
 from bokeh.plotting import figure, output_file, show, ColumnDataSource, curdoc
 from bokeh.models import HoverTool, CustomJS, Legend
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn
@@ -160,7 +160,7 @@ from bokeh.io import output_file, show
 from math import pi 
 
 
-# In[10]:
+# In[133]:
 
 '''Constructing top candlestick chart with ichimoku plot.'''
 inc = df.Close > df.Open
@@ -189,12 +189,12 @@ def make_plot(sourceInc, sourceDec, source, df):
     p.grid.grid_line_alpha = 0.30 
 
     # Construct increasing and decreasing lines.
-    seg1 = p.segment('Date', 'High', 'Date', 'Low', color="#17BECF", source = sourceInc)
-    seg2 = p.segment('Date', 'High', 'Date', 'Low', color="#FF7777", source = sourceDec)
+    seg1 = p.segment('Date', 'High', 'Date', 'Low', color='#17BECF', source = sourceInc)
+    seg2 = p.segment('Date', 'High', 'Date', 'Low', color='#FF7777', source = sourceDec)
 
     # Construct increasing and decreasing bars. 
-    bar1 = p.vbar('Date', w, 'Open', 'Close', fill_color="#17BECF", line_color="#17BECF", source = sourceInc)
-    bar2 = p.vbar('Date', w, 'Open', 'Close', fill_color="#FF7777", line_color="#FF7777", source = sourceDec)
+    bar1 = p.vbar('Date', w, 'Open', 'Close', fill_color='#17BECF', line_color='#17BECF', source = sourceInc)
+    bar2 = p.vbar('Date', w, 'Open', 'Close', fill_color='#FF7777', line_color='#FF7777', source = sourceDec)
 
     #Adding hover tool feature.
     hover = HoverTool(
@@ -219,16 +219,17 @@ def make_plot(sourceInc, sourceDec, source, df):
     p.add_tools(hover)
 
     # Add line render to display ichimoku plot.
-    r1 = p.line('Date', 'tenkan_sen', line_width = 1, color = "#92FFB4", source = source)
-    r2 = p.line('Date', 'kijun_sen', line_width = 1, color = "#92B2FF", source = source)
-    r3 = p.line('Date', 'senkou_span_a', line_width = 1, color = "#C092FF", source = source)
-    r4 = p.line('Date', 'senkou_span_b', line_width = 1, color = "#FFE592", source = source)
-    r5 = p.line('Date', 'chikou_span', line_width = 1, color = "#6878FB", source = source)
+    r1 = p.line('Date', 'tenkan_sen', line_width = 1, color = '#92FFB4', source = source)
+    r2 = p.line('Date', 'kijun_sen', line_width = 1, color = '#92B2FF', source = source)
+    r3 = p.line('Date', 'senkou_span_a', line_width = 1, color = '#98D4FD', source = source)
+    r4 = p.line('Date', 'senkou_span_b', line_width = 1, color = '#F7B0B6', source = source)
+    r5 = p.line('Date', 'chikou_span', line_width = 1, color = '#6878FB', source = source)
 
     # Add bar render to display scaled down volume. TODO: make generalised scale for all currencies. 
-    r6 = p.vbar('Date', w, 'Scaled Volume', 0, color="#5DE0F6", source = source)
+    r6 = p.vbar('Date', w, 'Scaled Volume', 0, color='#5DE0F6', source = source)
     
-    return p
+    renders = [r1, r2, r3, r4, r5, r6]
+    return p, renders
 
 def fill_area(p, df):  
     '''Fill area between senkou span A and B.'''
@@ -274,11 +275,11 @@ def fill_area(p, df):
     return patch_renders
 
 
-top_plot = make_plot(sourceInc_top, sourceDec_top, source_top, df)
+top_plot, top_renders = make_plot(sourceInc_top, sourceDec_top, source_top, df)
 r7 = fill_area(top_plot, df)
 top_plot.title.text = 'Bitcoin Chart'
 
-bottom_plot = make_plot(sourceInc_bottom, sourceDec_bottom, source_bottom, df_rip)
+bottom_plot, bottom_renders = make_plot(sourceInc_bottom, sourceDec_bottom, source_bottom, df_rip)
 r8 = fill_area(bottom_plot, df_rip)
 bottom_plot.title.text = 'Ripple Chart'
 
@@ -293,10 +294,10 @@ bottom_plot.title.text = 'Ripple Chart'
 top_plot.add_layout(legend, 'right')'''
 
 
-# In[18]:
+# In[152]:
 
 def calc_returns(df_x, df_y): 
-    '''Return data frame consisting of returns for 2 currencies.'''
+    '''Returns data frame consisting of returns for 2 currencies.'''
     start_date = df_x['Date'].min()
     end_date = df_x['Date'].max()
     
@@ -309,19 +310,111 @@ def calc_returns(df_x, df_y):
     d = {'x': [], 'y': []} 
     for i in range(0, len(df_x)-1): 
         if df_x.ix[i, 'Date'] > start_date and df_x.ix[i, 'Date'] < end_date: 
-            ret = (df_x.ix[i+1,'Close'] - df_x.ix[i, 'Close'])/df_x.ix[i, 'Close']
+            ret = (df_x.ix[i,'Close'] - df_x.ix[i+1, 'Close'])/df_x.ix[i+1, 'Close']
             d['x'].append(ret)
 
     for i in range(0, len(df_y)-1): 
         if df_y.ix[i, 'Date'] > start_date and df_y.ix[i, 'Date'] < end_date:
-            ret = (df_y.ix[i+1,'Close'] - df_y.ix[i, 'Close'])/df_y.ix[i, 'Close']
+            ret = (df_y.ix[i,'Close'] - df_y.ix[i+1, 'Close'])/df_y.ix[i+1, 'Close']
             d['y'].append(ret)
 
     df_returns = pd.DataFrame(data = d)
     return df_returns
 
 
-# In[19]:
+# In[200]:
+
+'''Construct scatter correlation plot with market index.'''
+df_y = df #Bitcoin as dependent variable.
+df_x = df_market #Crix as independent variable.
+
+df_returns_2 = calc_returns(df_x, df_y)
+sourceCorr = ColumnDataSource(data = df_returns_2)
+corr_plot = figure(plot_width=400, plot_height=350,
+             tools='pan,wheel_zoom,box_select,reset', title = "Bitcoin vs. Crix Returns")
+corr_plot.circle('x', 'y', size=2, source=sourceCorr,
+            selection_color="orange", alpha=0.6, nonselection_alpha=0.1, selection_alpha=0.4)
+
+
+# In[314]:
+
+def calc_returns_for_metrics(df):
+    '''Calculate and return a list of returns.'''
+    returns = []
+    for i in range(0, len(df)-1):
+        # Computes daily returns
+        rp = (df.ix[i,'Close'] - df.ix[i+1, 'Close'])/df.ix[i+1, 'Close']
+        returns.append(tuple((df.ix[i, 'Date'], rp)))
+    #Sort returns by earliest to latest date.
+    returns = sorted(returns, key=lambda L: L[0])
+    return returns
+
+
+# In[332]:
+
+def get_data_between_dates(returns, start_date, end_date):
+    '''Returns data between specified dates'''
+    returns = [x for x in returns if x[0] >= datetime.strptime(start_date, "%Y-%m-%d")
+               and x[0] <= datetime.strptime(end_date, "%Y-%m-%d")]
+    returns = [x[1] for x in returns]
+    return returns 
+
+
+# In[333]:
+
+def calc_sharpe(df, rf, start_date, end_date):
+    '''Calculate the annualised Sharpe Ratio using a risk free rate between a specified date range'''
+    returns = calc_returns_for_metrics(df)
+    returns = get_data_between_dates(returns, start_date, end_date)
+    rp_mean = np.mean(returns)
+    rp_sd = np.std(returns)
+    return ((rp_mean-rf)/rp_sd) * (365/np.sqrt(365))
+
+
+# In[334]:
+
+def calc_sortino(df, rf, mar, start_date, end_date):
+    '''Calculates the annualised Sortino ratio by using standard deviation of negative returns between a specified date range.'''
+    rp = calc_returns_for_metrics(df)
+    rp = get_data_between_dates(rp, start_date, end_date)
+    neg_rp = [x for x in rp if x < mar]
+    return ((np.mean(rp)) - rf)/np.std(neg_rp) * (365/np.sqrt(365))
+
+
+# In[335]:
+
+def calc_treynor(df, market, rf, start_date, end_date):
+    '''Calculates the Treynor Ratio between a specified date range.'''
+    rp = calc_returns_for_metrics(df)
+    rb = calc_returns_for_metrics(market)
+    rp = get_data_between_dates(rp, start_date, end_date)
+    rb = get_data_between_dates(rb, start_date, end_date)
+    beta = np.cov(rp, rb, ddof = 1)[0][1]/np.var(rb, ddof = 1)
+    return ((np.mean(rp) - rf)/beta) 
+
+
+# In[336]:
+
+def calc_infoRatio(df, market, start_date, end_date):
+    '''Calculates the Information Ratio between a specified date range.'''
+    y = calc_returns_for_metrics(df)
+    x = calc_returns_for_metrics(market)
+    
+    y = get_data_between_dates(y, start_date, end_date)
+    x = get_data_between_dates(x, start_date, end_date)
+    
+    coef = np.polyfit(x, y, 1)
+    beta = coef[0]
+    alpha = coef[1]
+    residuals = []
+    for i in range(0, len(x)):
+        predicted = alpha + beta*x[i]
+        residuals = np.append(residuals, y[i] - predicted)
+
+    return (alpha/np.std(residuals)) 
+
+
+# In[339]:
 
 def compute_regression(df):
     '''Computes the multiple metrics from regression of 2 datasets.'''
@@ -334,36 +427,31 @@ def compute_regression(df):
     return final_metrics
 
 
-# In[20]:
-
-'''Construct scatter correlation plot with market index.'''
-df_x = df
-df_y = df_market 
-
-df_returns_2 = calc_returns(df_x, df_y)
-sourceCorr = ColumnDataSource(data = df_returns_2)
-corr_plot = figure(plot_width=400, plot_height=350,
-             tools='pan,wheel_zoom,box_select,reset', title = "Bitcoin vs. Crix Returns")
-corr_plot.circle('x', 'y', size=2, source=sourceCorr,
-            selection_color="orange", alpha=0.6, nonselection_alpha=0.1, selection_alpha=0.4)
-
-
-# In[21]:
+# In[359]:
 
 '''Creates data-table of correlation.'''
 metrics = compute_regression(df_returns_2)
-reg_data = dict(metrics=["Beta", "P-value of Beta", "Alpha", "Correlation", "R-squared"],
-                values=[metrics[0], metrics[4], metrics[1], metrics[2], metrics[3]],
+START_DATE = '2016-11-22'
+END_DATE = '2017-11-22'
+
+#Calculate sharpe, sortino, treynor and info ratios.
+sharpe = np.around(calc_sharpe(df_y,  0, START_DATE, END_DATE), decimals = 5)
+sortino = np.around(calc_sortino(df_y, 0, 0, START_DATE, END_DATE), decimals = 5)
+treynor = np.around(calc_treynor(df_y, df_x, 0, START_DATE, END_DATE), decimals = 5)
+info = np.around(calc_infoRatio(df_y, df_x, START_DATE, END_DATE), decimals = 5)
+
+reg_data = dict(metrics=["Beta", "P-value of Beta", "Alpha", "Correlation", "R-squared", "Sharpe", "Sortino", "Treynor", "Info"],
+                values=[metrics[0], metrics[4], metrics[1], metrics[2], metrics[3], sharpe, sortino, treynor, info],
             )
 reg_source = ColumnDataSource(reg_data)
 columns_table = [
         TableColumn(field="metrics", title="Metrics"),
         TableColumn(field="values", title="Values"),
     ]
-data_table = DataTable(source=reg_source, columns=columns_table, width=400, height=280)
+data_table = DataTable(source=reg_source, columns=columns_table, width=400, height=280, row_headers = False)
 
 
-# In[22]:
+# In[360]:
 
 #Adding button widgets
 button_3m = Button(label= "3 month", width = 80)
@@ -418,7 +506,30 @@ button_ytd.on_click(update_ytd)
 button_all.on_click(update_all)
 
 
-# In[23]:
+# In[361]:
+
+#Adding checkbox button group widget 
+checkbox_button_group = CheckboxButtonGroup(labels=['Ichimoku', 'Volume'], active=[0, 1])
+
+def update_renders(active):
+    '''Toggle ichimoku and volume renders to make visible.'''
+    #Make patches visible. 
+    r7[0].visible = 0 in checkbox_button_group.active
+    r7[1].visible = 0 in checkbox_button_group.active
+    r8[0].visible = 0 in checkbox_button_group.active
+    r8[1].visible = 0 in checkbox_button_group.active
+    #Make ichimoku renders visible.
+    for i in range(0, len(top_renders) - 1): 
+        top_renders[i].visible = 0 in checkbox_button_group.active
+        bottom_renders[i].visible = 0 in checkbox_button_group.active
+    #Make volume renders visible.
+    top_renders[-1].visible = 1 in checkbox_button_group.active
+    bottom_renders[-1].visible = 1 in checkbox_button_group.active
+    
+checkbox_button_group.on_click(update_renders)
+
+
+# In[366]:
 
 # Create dropdown widgets. 
 DEFAULT_TICKERS = ['Bitcoin', 'Ripple', 'Ethereum', 'Crix']
@@ -427,18 +538,46 @@ def nix(val, lst):
     '''Remove currently selected currency from dropdown list.'''
     return [x for x in lst if x != val]
 
-dropdown_top = Select(value = "Bitcoin", options=nix('Crix', DEFAULT_TICKERS))
-dropdown_bottom = Select(value = "Crix", options=nix('Bitcoin', DEFAULT_TICKERS))
+dropdown_top = Select(value = "Bitcoin", options=nix('Crix', DEFAULT_TICKERS), title = 'Y variable:')
+dropdown_bottom = Select(value = "Crix", options=nix('Bitcoin', DEFAULT_TICKERS), title = 'X variable:')
 
+def update_metrics(df_x, df_y):
+    '''Update source for metrics table'''
+    # Update returns.
+    new_returns = calc_returns(df_x, df_y) 
+    new_sourceCorr = new_returns 
+    sourceCorr.data.update(new_sourceCorr)
+    
+    # Update correlation metrics.
+    new_reg_metrics = compute_regression(new_returns)
+    new_sharpe = np.around(calc_sharpe(df_y,  0, START_DATE, END_DATE), decimals = 5)
+    new_sortino = np.around(calc_sortino(df_y, 0, 0, START_DATE, END_DATE), decimals = 5)
+    new_treynor = np.around(calc_treynor(df_y, df_x, 0, START_DATE, END_DATE), decimals = 5)
+    new_info = np.around(calc_infoRatio(df_y, df_x, START_DATE, END_DATE), decimals = 5)
+    
+    new_reg_data = dict(metrics=["Beta", "P-value of Beta", "Alpha", "Correlation", 
+                                 "R-squared", "Sharpe", "Sortino", "Treynor", "Info"],
+                        values=[new_reg_metrics[0], new_reg_metrics[4], new_reg_metrics[1], 
+                                new_reg_metrics[2], new_reg_metrics[3], new_sharpe, new_sortino, 
+                                new_treynor, new_info],
+                        )
+    new_reg_sourceCorr = new_reg_data
+    reg_source.data.update(new_reg_sourceCorr) 
+    
+    
 def update_top_source(df, market = False): 
-    '''Update source for top plot and x data for correlation plot.'''
+    '''Update source for top plot and x data for correlation plot and tables.'''
     global df_x, df_y, r7 
 
     if market == False:  # Don't create ichimoku plots for CRIX data.
         top_plot.renderers.remove(r7[0])
         top_plot.renderers.remove(r7[1])
         r7 = fill_area(top_plot, df)
-
+        
+        if 0 not in checkbox_button_group.active: 
+            r7[0].visible = False
+            r7[1].visible = False 
+            
         inc = df.Close > df.Open
         dec = df.Open > df.Close
         newSourceInc = ColumnDataSource(ColumnDataSource.from_df(df.loc[inc]))
@@ -451,32 +590,23 @@ def update_top_source(df, market = False):
         
         top_plot.title.text = '%s Chart' % (dropdown_top.value)
 
-    df_x = df 
-    # Update returns.
-    new_returns = calc_returns(df_x, df_y) 
-    new_sourceCorr = new_returns 
-    sourceCorr.data.update(new_sourceCorr)
-    
-    # Update correlation metrics.
-    new_reg_metrics = compute_regression(new_returns)
-    new_reg_data = dict(metrics=["Beta", "P-value of Beta", "Alpha", "Correlation", "R-squared"],
-                values=[new_reg_metrics[0], new_reg_metrics[4], new_reg_metrics[1], 
-                        new_reg_metrics[2], new_reg_metrics[3]],
-            )
-    new_reg_sourceCorr = new_reg_data
-    reg_source.data.update(new_reg_sourceCorr) 
-    
+    df_y = df 
+    update_metrics(df_x, df_y)
     corr_plot.title.text = '%s vs. %s Returns' % (dropdown_top.value, dropdown_bottom.value)
 
 def update_bottom_source(df, market = False):
-    '''Update source for bottom plot and y data for correlation plot.'''
+    '''Update source for bottom plot and y data for correlation plot and table.'''
     global df_x, df_y, r8
 
     if market == False: #Don't create ichimoku plots for CRIX data.
         bottom_plot.renderers.remove(r8[0])
         bottom_plot.renderers.remove(r8[1])
         r8 = fill_area(bottom_plot, df)
-
+        
+        if 0 not in checkbox_button_group.active: 
+            r8[0].visible = False
+            r8[1].visible = False 
+            
         inc = df.Close > df.Open
         dec = df.Open > df.Close
         newSourceInc = ColumnDataSource(ColumnDataSource.from_df(df.loc[inc]))
@@ -489,20 +619,8 @@ def update_bottom_source(df, market = False):
 
         bottom_plot.title.text = '%s Chart' % (dropdown_bottom.value)
 
-    df_y = df
-    # Update returns.
-    new_returns = calc_returns(df_x, df_y)
-    new_sourceCorr = new_returns 
-    sourceCorr.data.update(new_sourceCorr)
-    # Update correlation metrics.
-    new_reg_metrics = compute_regression(new_returns)
-    new_reg_data = dict(metrics=["Beta", "P-value of Beta", "Alpha", "Correlation", "R-squared"],
-                values=[new_reg_metrics[0], new_reg_metrics[4], new_reg_metrics[1], 
-                        new_reg_metrics[2], new_reg_metrics[3]],
-            )
-    new_reg_sourceCorr = new_reg_data
-    reg_source.data.update(new_reg_sourceCorr) 
-    
+    df_x = df
+    update_metrics(df_x, df_y)
     corr_plot.title.text = '%s vs. %s Returns' % (dropdown_top.value, dropdown_bottom.value)
     
 def update_top_plot(attrname, old, new):
@@ -533,15 +651,21 @@ dropdown_top.on_change('value', update_top_plot)
 dropdown_bottom.on_change('value', update_bottom_plot)
 
 
-# In[24]:
+# In[365]:
 
 #Format layout and display plot
-button_controls = row([button_3m, button_6m, button_1y, button_ytd, button_all])
-dropdown_controls = row(corr_plot, column(dropdown_top, dropdown_bottom))
+button_controls = row([button_3m, button_6m, button_1y, button_ytd, button_all, Spacer(width=50), checkbox_button_group])
+dropdown_and_tables = column(column(dropdown_top, dropdown_bottom), data_table)
+top_row = row(corr_plot, dropdown_and_tables)
 price_plots = column(column(button_controls, top_plot), bottom_plot)
 
 output_file("dashboard.html", title="dashboard.py")
-layout = column(dropdown_controls, widgetbox(data_table), price_plots)
+layout = column(top_row, price_plots)
 curdoc().add_root(layout)
 show(layout)
+
+
+# In[ ]:
+
+
 
