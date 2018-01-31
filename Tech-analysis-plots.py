@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[124]:
+# In[56]:
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,7 +11,7 @@ from datetime import datetime
 from scipy import stats
 
 
-# In[125]:
+# In[57]:
 
 def ichimoku_plot(df):
     '''Computes the Ichimoku Kink? Hy? trend identification system.'''
@@ -46,7 +46,7 @@ def ichimoku_plot(df):
     return df[df.columns[6:]]
 
 
-# In[126]:
+# In[58]:
 
 def reverse_date(df, remove_date="Yes", ich_plot="Yes"):
     '''Reverses the dataset so it is in chronological order. Optional to remove date column and set as index.'''
@@ -72,7 +72,7 @@ def reverse_date(df, remove_date="Yes", ich_plot="Yes"):
     return final_data
 
 
-# In[127]:
+# In[59]:
 
 def compute_metrics(name, data, rf, mar, market):
     '''Computes 4 metrics of the Cryptocurrency and returns Pandas dataframe.'''
@@ -92,7 +92,7 @@ def compute_metrics(name, data, rf, mar, market):
     return results
 
 
-# In[128]:
+# In[60]:
 
 def scale_volume(dataframe, scale_factor): 
     '''Append a column of volumes scaled down by specified factor'''
@@ -100,7 +100,7 @@ def scale_volume(dataframe, scale_factor):
     return dataframe 
 
 
-# In[129]:
+# In[61]:
 
 def sma_plot(df, window):
     '''Computes simple moving average.'''
@@ -108,7 +108,7 @@ def sma_plot(df, window):
     return rolling.mean()
 
 
-# In[130]:
+# In[62]:
 
 def bollinger_plot(df, window, num_sd):
     '''Computes Bollinger bands depending on number of standard deviation and window.''' 
@@ -123,7 +123,7 @@ def bollinger_plot(df, window, num_sd):
     return bollinger
 
 
-# In[131]:
+# In[63]:
 
 import warnings
 warnings.filterwarnings('ignore') # Warnings were getting annoying.
@@ -148,11 +148,11 @@ df_market.reindex(index=df_market.index[::-1])
 df_market['Date'] = pd.to_datetime(df_market['Date'], dayfirst = True) 
 
 
-# In[132]:
+# In[64]:
 
 from bokeh.events import ButtonClick
 from bokeh.layouts import column, row, widgetbox, Spacer
-from bokeh.models.widgets import Button, Select, CheckboxButtonGroup
+from bokeh.models.widgets import Button, Select, CheckboxButtonGroup, DatePicker
 from bokeh.plotting import figure, output_file, show, ColumnDataSource, curdoc
 from bokeh.models import HoverTool, CustomJS, Legend
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn
@@ -160,7 +160,7 @@ from bokeh.io import output_file, show
 from math import pi 
 
 
-# In[133]:
+# In[65]:
 
 '''Constructing top candlestick chart with ichimoku plot.'''
 inc = df.Close > df.Open
@@ -175,6 +175,10 @@ sourceInc_bottom = ColumnDataSource(ColumnDataSource.from_df(df_rip.loc[inc1]))
 sourceDec_bottom = ColumnDataSource(ColumnDataSource.from_df(df_rip.loc[dec1]))
 source_bottom = ColumnDataSource(data = df_rip)
 
+
+# In[66]:
+
+
 def make_plot(sourceInc, sourceDec, source, df):
     '''Construct top and bottom candle + ichimoku plot'''
     w = 12*60*60*1000 # Half day in ms.
@@ -184,7 +188,7 @@ def make_plot(sourceInc, sourceDec, source, df):
 
     TOOLS = "pan, wheel_zoom, xbox_select, reset, save"
     p = figure(x_axis_type = "datetime", tools = TOOLS,
-               plot_width = 1000, plot_height = 400, x_range = (df_6m.min(), df_6m.max()), active_drag = "xbox_select") 
+               plot_width = 1200, plot_height = 450, x_range = (df_6m.min(), df_6m.max()), active_drag = "xbox_select") 
     p.xaxis.major_label_orientation = pi/4
     p.grid.grid_line_alpha = 0.30 
 
@@ -219,17 +223,29 @@ def make_plot(sourceInc, sourceDec, source, df):
     p.add_tools(hover)
 
     # Add line render to display ichimoku plot.
-    r1 = p.line('Date', 'tenkan_sen', line_width = 1, color = '#92FFB4', source = source)
-    r2 = p.line('Date', 'kijun_sen', line_width = 1, color = '#92B2FF', source = source)
-    r3 = p.line('Date', 'senkou_span_a', line_width = 1, color = '#98D4FD', source = source)
-    r4 = p.line('Date', 'senkou_span_b', line_width = 1, color = '#F7B0B6', source = source)
-    r5 = p.line('Date', 'chikou_span', line_width = 1, color = '#6878FB', source = source)
+    r1 = p.line('Date', 'tenkan_sen', line_width = 1, color = '#92FFB4', legend = "Tenken-sen", 
+                muted_alpha = 0.20,  source = source)
+    r2 = p.line('Date', 'kijun_sen', line_width = 1, color = '#92B2FF', legend = "Kijun-sen", 
+                muted_alpha = 0.20, source = source)
+    r3 = p.line('Date', 'senkou_span_a', line_width = 1, color = '#98D4FD', legend = "Senkou Span A", 
+                muted_alpha = 0.20, source = source)
+    r4 = p.line('Date', 'senkou_span_b', line_width = 1, color = '#F7B0B6', legend = "Senkou Span B", 
+                muted_alpha = 0.20, source = source)
+    r5 = p.line('Date', 'chikou_span', line_width = 1, color = '#6878FB', legend = "Chikou Span", 
+                muted_alpha = 0.20, source = source)
 
     # Add bar render to display scaled down volume. TODO: make generalised scale for all currencies. 
     r6 = p.vbar('Date', w, 'Scaled Volume', 0, color='#5DE0F6', source = source)
     
+    p.legend.location = "top_left"
+    p.legend.click_policy="mute"
+    p.legend.orientation = "horizontal"
+
     renders = [r1, r2, r3, r4, r5, r6]
     return p, renders
+
+
+# In[67]:
 
 def fill_area(p, df):  
     '''Fill area between senkou span A and B.'''
@@ -269,12 +285,15 @@ def fill_area(p, df):
             ys_red.append(np.append(line_a, line_b[::-1]))
   
     patch_renders = []
-    patch_renders.append(p.patches(xs_blue, ys_blue, color='#98D4FD', line_color = '#98D4FD', fill_alpha = 0.20))
-    patch_renders.append(p.patches(xs_red, ys_red, color='#F7B0B6', line_color = '#F7B0B6', fill_alpha = 0.20))
+    patch_renders.append(p.patches(xs_blue, ys_blue, color='#98D4FD', line_color = '#98D4FD', line_alpha = 0, fill_alpha = 0.20))
+    patch_renders.append(p.patches(xs_red, ys_red, color='#F7B0B6', line_color = '#F7B0B6', line_alpha = 0, fill_alpha = 0.20))
     
     return patch_renders
 
 
+# In[68]:
+
+#Make plots.
 top_plot, top_renders = make_plot(sourceInc_top, sourceDec_top, source_top, df)
 r7 = fill_area(top_plot, df)
 top_plot.title.text = 'Bitcoin Chart'
@@ -283,18 +302,8 @@ bottom_plot, bottom_renders = make_plot(sourceInc_bottom, sourceDec_bottom, sour
 r8 = fill_area(bottom_plot, df_rip)
 bottom_plot.title.text = 'Ripple Chart'
 
-#Display legend. TODO: adjust legend to make visible 
-'''legend = Legend(items = [
-    ("Tenkan-Sen", [r1]),
-    ("Kijun-Sen", [r2]),
-    ("Senkou Span A", [r3]),
-    ("Senkou Span B", [r4]),
-    ("Chikou Span", [r5])
-], location = (0,399))
-top_plot.add_layout(legend, 'right')'''
 
-
-# In[152]:
+# In[69]:
 
 def calc_returns(df_x, df_y): 
     '''Returns data frame consisting of returns for 2 currencies.'''
@@ -307,11 +316,12 @@ def calc_returns(df_x, df_y):
     if df_y['Date'].max() < df_x['Date'].max(): # Dataset Y ends earlier so we end there. 
         end_date = df_y['Date'].max()
 
-    d = {'x': [], 'y': []} 
+    d = {'Date': [], 'x': [], 'y': []} 
     for i in range(0, len(df_x)-1): 
         if df_x.ix[i, 'Date'] > start_date and df_x.ix[i, 'Date'] < end_date: 
             ret = (df_x.ix[i,'Close'] - df_x.ix[i+1, 'Close'])/df_x.ix[i+1, 'Close']
             d['x'].append(ret)
+            d['Date'].append(df_x.ix[i, 'Date'])
 
     for i in range(0, len(df_y)-1): 
         if df_y.ix[i, 'Date'] > start_date and df_y.ix[i, 'Date'] < end_date:
@@ -322,7 +332,7 @@ def calc_returns(df_x, df_y):
     return df_returns
 
 
-# In[200]:
+# In[70]:
 
 '''Construct scatter correlation plot with market index.'''
 df_y = df #Bitcoin as dependent variable.
@@ -330,13 +340,13 @@ df_x = df_market #Crix as independent variable.
 
 df_returns_2 = calc_returns(df_x, df_y)
 sourceCorr = ColumnDataSource(data = df_returns_2)
-corr_plot = figure(plot_width=400, plot_height=350,
+corr_plot = figure(plot_width=500, plot_height=350,
              tools='pan,wheel_zoom,box_select,reset', title = "Bitcoin vs. Crix Returns")
 corr_plot.circle('x', 'y', size=2, source=sourceCorr,
-            selection_color="orange", alpha=0.6, nonselection_alpha=0.1, selection_alpha=0.4)
+            selection_color="#F7B0B6", alpha=0.6, nonselection_alpha=0.1, selection_alpha=0.4)
 
 
-# In[314]:
+# In[71]:
 
 def calc_returns_for_metrics(df):
     '''Calculate and return a list of returns.'''
@@ -350,7 +360,7 @@ def calc_returns_for_metrics(df):
     return returns
 
 
-# In[332]:
+# In[72]:
 
 def get_data_between_dates(returns, start_date, end_date):
     '''Returns data between specified dates'''
@@ -360,7 +370,7 @@ def get_data_between_dates(returns, start_date, end_date):
     return returns 
 
 
-# In[333]:
+# In[73]:
 
 def calc_sharpe(df, rf, start_date, end_date):
     '''Calculate the annualised Sharpe Ratio using a risk free rate between a specified date range'''
@@ -371,7 +381,7 @@ def calc_sharpe(df, rf, start_date, end_date):
     return ((rp_mean-rf)/rp_sd) * (365/np.sqrt(365))
 
 
-# In[334]:
+# In[74]:
 
 def calc_sortino(df, rf, mar, start_date, end_date):
     '''Calculates the annualised Sortino ratio by using standard deviation of negative returns between a specified date range.'''
@@ -381,31 +391,27 @@ def calc_sortino(df, rf, mar, start_date, end_date):
     return ((np.mean(rp)) - rf)/np.std(neg_rp) * (365/np.sqrt(365))
 
 
-# In[335]:
+# In[75]:
 
-def calc_treynor(df, market, rf, start_date, end_date):
+def calc_treynor(df, market, rf, start_date, end_date, beta):
     '''Calculates the Treynor Ratio between a specified date range.'''
     rp = calc_returns_for_metrics(df)
     rb = calc_returns_for_metrics(market)
     rp = get_data_between_dates(rp, start_date, end_date)
     rb = get_data_between_dates(rb, start_date, end_date)
-    beta = np.cov(rp, rb, ddof = 1)[0][1]/np.var(rb, ddof = 1)
     return ((np.mean(rp) - rf)/beta) 
 
 
-# In[336]:
+# In[76]:
 
-def calc_infoRatio(df, market, start_date, end_date):
+def calc_infoRatio(df, market, start_date, end_date, alpha, beta):
     '''Calculates the Information Ratio between a specified date range.'''
     y = calc_returns_for_metrics(df)
     x = calc_returns_for_metrics(market)
     
     y = get_data_between_dates(y, start_date, end_date)
     x = get_data_between_dates(x, start_date, end_date)
-    
-    coef = np.polyfit(x, y, 1)
-    beta = coef[0]
-    alpha = coef[1]
+
     residuals = []
     for i in range(0, len(x)):
         predicted = alpha + beta*x[i]
@@ -414,7 +420,7 @@ def calc_infoRatio(df, market, start_date, end_date):
     return (alpha/np.std(residuals)) 
 
 
-# In[339]:
+# In[77]:
 
 def compute_regression(df):
     '''Computes the multiple metrics from regression of 2 datasets.'''
@@ -427,7 +433,7 @@ def compute_regression(df):
     return final_metrics
 
 
-# In[359]:
+# In[78]:
 
 '''Creates data-table of correlation.'''
 metrics = compute_regression(df_returns_2)
@@ -437,8 +443,8 @@ END_DATE = '2017-11-22'
 #Calculate sharpe, sortino, treynor and info ratios.
 sharpe = np.around(calc_sharpe(df_y,  0, START_DATE, END_DATE), decimals = 5)
 sortino = np.around(calc_sortino(df_y, 0, 0, START_DATE, END_DATE), decimals = 5)
-treynor = np.around(calc_treynor(df_y, df_x, 0, START_DATE, END_DATE), decimals = 5)
-info = np.around(calc_infoRatio(df_y, df_x, START_DATE, END_DATE), decimals = 5)
+treynor = np.around(calc_treynor(df_y, df_x, 0, START_DATE, END_DATE, metrics[0]), decimals = 5)
+info = np.around(calc_infoRatio(df_y, df_x, START_DATE, END_DATE, metrics[1], metrics[0]), decimals = 5)
 
 reg_data = dict(metrics=["Beta", "P-value of Beta", "Alpha", "Correlation", "R-squared", "Sharpe", "Sortino", "Treynor", "Info"],
                 values=[metrics[0], metrics[4], metrics[1], metrics[2], metrics[3], sharpe, sortino, treynor, info],
@@ -448,57 +454,141 @@ columns_table = [
         TableColumn(field="metrics", title="Metrics"),
         TableColumn(field="values", title="Values"),
     ]
-data_table = DataTable(source=reg_source, columns=columns_table, width=400, height=280, row_headers = False)
+data_table = DataTable(source=reg_source, columns=columns_table, width=210, height=280, row_headers = False)
 
 
-# In[360]:
+# In[79]:
+
+def calc_summary_stats(df_x, df_y, calc_x = True, calc_y = True): 
+    '''Computes summary statistics for the returns of the x and y variable.'''
+    df_returns = calc_returns(df_x, df_y)
+    
+    if calc_x == True: 
+        x_return_stats = np.around(df_returns['x'].describe(), decimals = 5)
+        x_price_stats = np.around(df_x['Close'].describe(), decimals = 5)
+        x_stats_data = dict(stats = ["Mean", "Std", "Min", "25%", "50%", "75%", "Max"],
+                            returns = [x_return_stats[1], x_return_stats[2], x_return_stats[3], x_return_stats[4], 
+                                      x_return_stats[5], x_return_stats[6], x_return_stats[7]],
+                            prices = [x_price_stats[1], x_price_stats[2], x_price_stats[3], x_price_stats[4], x_price_stats[5],
+                                      x_price_stats[6], x_price_stats[7]])
+        if calc_y == False: 
+            return x_stats_data 
+    
+    if calc_y == True: 
+        y_return_stats = np.around(df_returns['y'].describe(), decimals = 5)
+        y_price_stats = np.around(df_y['Close'].describe(), decimals = 5)
+        y_stats_data = dict(stats = ["Mean", "Std", "Min", "25%", "50%", "75%", "Max"],
+                            returns = [y_return_stats[1], y_return_stats[2], y_return_stats[3], y_return_stats[4], 
+                                          y_return_stats[5], y_return_stats[6], y_return_stats[7]],
+                            prices = [y_price_stats[1], y_price_stats[2], y_price_stats[3], y_price_stats[4], y_price_stats[5],
+                                          y_price_stats[6], y_price_stats[7]])
+        if calc_x == False: 
+            return y_stats_data 
+        
+    return x_stats_data, y_stats_data
+
+
+# In[80]:
+
+#Creating the summary statistics tables 
+x_sum_stats, y_sum_stats = calc_summary_stats(df_x, df_y)
+x_table_source = ColumnDataSource(x_sum_stats)
+columns_x_table = [
+        TableColumn(field="stats", title="Statistic"),
+        TableColumn(field="returns", title="Returns"),
+        TableColumn(field="prices", title = "Prices"),
+    ]
+x_table = DataTable(source=x_table_source, columns=columns_x_table, width=210, height=280, row_headers = False)
+
+y_table_source = ColumnDataSource(y_sum_stats)
+columns_y_table = [
+        TableColumn(field="stats", title="Statistic"),
+        TableColumn(field="returns", title="Returns"),
+        TableColumn(field="prices", title = "Prices"),
+    ]
+y_table = DataTable(source=y_table_source, columns=columns_y_table, width=210, height=280, row_headers = False)
+
+
+# In[81]:
 
 #Adding button widgets
+button_1m = Button(label = "1 month", width = 80)
 button_3m = Button(label= "3 month", width = 80)
 button_6m = Button(label = "6 month", width = 80)
 button_1y = Button(label = "1 Year", width = 80)
 button_ytd = Button(label = "YTD", width = 80)
 button_all = Button(label = "All", width = 80)
 
+
+# In[82]:
+
+START_OF_YEAR = "2017-1-01"
+
+def update_1m(): 
+    '''Update zoom to 1 month.'''
+    df_1m = df.iloc[-30:,]['Date']
+    top_plot.x_range.start = df_1m.min()
+    top_plot.x_range.end = df_1m.max()
+    bottom_plot.x_range.start = df_1m.min()
+    bottom_plot.x_range.end = df_1m.max()
+
+
+# In[83]:
+
 def update_3m(): 
-    '''Update zoom to 3 months'''
+    '''Update zoom to 3 months.'''
     df_3m = df.iloc[-90:,]['Date']
     top_plot.x_range.start = df_3m.min()
     top_plot.x_range.end = df_3m.max()
     bottom_plot.x_range.start = df_3m.min()
     bottom_plot.x_range.end = df_3m.max()
 
+
+# In[84]:
+
 def update_6m():
-    '''Update zoom to 6 months'''
+    '''Update zoom to 6 months.'''
     df_6m = df.iloc[-180:,]['Date']
     top_plot.x_range.start = df_6m.min()
     top_plot.x_range.end = df_6m.max()
     bottom_plot.x_range.start = df_6m.min()
     bottom_plot.x_range.end = df_6m.max()
 
+
+# In[85]:
+
 def update_1y():
-    '''Update zoom to 12 months'''
+    '''Update zoom to 12 months.'''
     df_1y = df.iloc[-365:,]['Date']
     top_plot.x_range.start = df_1y.min()
     top_plot.x_range.end = df_1y.max()
     bottom_plot.x_range.start = df_1y.min()
     bottom_plot.x_range.end = df_1y.max()
 
+
+# In[86]:
+
 def update_ytd():
-    '''Update zoom to start of year'''
-    start_date = datetime.strptime("2017-1-01", "%Y-%m-%d")
-    top_plot.x_range.start = start_date
+    '''Update zoom to start of year.'''
+    top_plot.x_range.start = datetime.strptime(START_OF_YEAR, "%Y-%m-%d")
     top_plot.x_range.end = df['Date'].max()
-    bottom_plot.x_range.start = start_date
+    bottom_plot.x_range.start = datetime.strptime(START_OF_YEAR, "%Y-%m-%d")
     bottom_plot.x_range.end = df['Date'].max()
 
+
+# In[87]:
+
 def update_all(): 
-    '''Update zoom to display all data'''
+    '''Update zoom to display all data.'''
     top_plot.x_range.start = df['Date'].min() 
     top_plot.x_range.end = df['Date'].max()
     bottom_plot.x_range.start = df['Date'].min()
     bottom_plot.x_range.end = df['Date'].max()
-    
+
+
+# In[88]:
+
+button_1m.on_click(update_1m)
 button_3m.on_click(update_3m)
 button_6m.on_click(update_6m)
 button_1y.on_click(update_1y)
@@ -506,7 +596,7 @@ button_ytd.on_click(update_ytd)
 button_all.on_click(update_all)
 
 
-# In[361]:
+# In[89]:
 
 #Adding checkbox button group widget 
 checkbox_button_group = CheckboxButtonGroup(labels=['Ichimoku', 'Volume'], active=[0, 1])
@@ -529,7 +619,7 @@ def update_renders(active):
 checkbox_button_group.on_click(update_renders)
 
 
-# In[366]:
+# In[90]:
 
 # Create dropdown widgets. 
 DEFAULT_TICKERS = ['Bitcoin', 'Ripple', 'Ethereum', 'Crix']
@@ -538,8 +628,11 @@ def nix(val, lst):
     '''Remove currently selected currency from dropdown list.'''
     return [x for x in lst if x != val]
 
-dropdown_top = Select(value = "Bitcoin", options=nix('Crix', DEFAULT_TICKERS), title = 'Y variable:')
-dropdown_bottom = Select(value = "Crix", options=nix('Bitcoin', DEFAULT_TICKERS), title = 'X variable:')
+dropdown_top = Select(value = "Bitcoin", width = 215, options=nix('Crix', DEFAULT_TICKERS), title = 'Y variable:')
+dropdown_bottom = Select(value = "Crix", width = 215, options=nix('Bitcoin', DEFAULT_TICKERS), title = 'X variable:')
+
+
+# In[91]:
 
 def update_metrics(df_x, df_y):
     '''Update source for metrics table'''
@@ -552,8 +645,8 @@ def update_metrics(df_x, df_y):
     new_reg_metrics = compute_regression(new_returns)
     new_sharpe = np.around(calc_sharpe(df_y,  0, START_DATE, END_DATE), decimals = 5)
     new_sortino = np.around(calc_sortino(df_y, 0, 0, START_DATE, END_DATE), decimals = 5)
-    new_treynor = np.around(calc_treynor(df_y, df_x, 0, START_DATE, END_DATE), decimals = 5)
-    new_info = np.around(calc_infoRatio(df_y, df_x, START_DATE, END_DATE), decimals = 5)
+    new_treynor = np.around(calc_treynor(df_y, df_x, 0, START_DATE, END_DATE, new_reg_metrics[0]), decimals = 5)
+    new_info = np.around(calc_infoRatio(df_y, df_x, START_DATE, END_DATE, new_reg_metrics[1], new_reg_metrics[0]), decimals = 5)
     
     new_reg_data = dict(metrics=["Beta", "P-value of Beta", "Alpha", "Correlation", 
                                  "R-squared", "Sharpe", "Sortino", "Treynor", "Info"],
@@ -563,8 +656,10 @@ def update_metrics(df_x, df_y):
                         )
     new_reg_sourceCorr = new_reg_data
     reg_source.data.update(new_reg_sourceCorr) 
-    
-    
+
+
+# In[92]:
+
 def update_top_source(df, market = False): 
     '''Update source for top plot and x data for correlation plot and tables.'''
     global df_x, df_y, r7 
@@ -592,7 +687,12 @@ def update_top_source(df, market = False):
 
     df_y = df 
     update_metrics(df_x, df_y)
+    new_y_table_source = calc_summary_stats(df_x, df_y, False, True)
+    y_table_source.data.update(new_y_table_source)
     corr_plot.title.text = '%s vs. %s Returns' % (dropdown_top.value, dropdown_bottom.value)
+
+
+# In[95]:
 
 def update_bottom_source(df, market = False):
     '''Update source for bottom plot and y data for correlation plot and table.'''
@@ -616,13 +716,18 @@ def update_bottom_source(df, market = False):
         sourceInc_bottom.data.update(newSourceInc.data)
         sourceDec_bottom.data.update(newSourceDec.data)
         source_bottom.data.update(newSource.data)
-
+    
         bottom_plot.title.text = '%s Chart' % (dropdown_bottom.value)
 
     df_x = df
     update_metrics(df_x, df_y)
+    new_x_table_source = calc_summary_stats(df_x, df_y, True, False)
+    x_table_source.data.update(new_x_table_source)
     corr_plot.title.text = '%s vs. %s Returns' % (dropdown_top.value, dropdown_bottom.value)
-    
+
+
+# In[96]:
+
 def update_top_plot(attrname, old, new):
     '''Update top plot to selected data set''' 
     dropdown_bottom.options = nix(new, DEFAULT_TICKERS)    
@@ -634,6 +739,9 @@ def update_top_plot(attrname, old, new):
         update_top_source(df)
     if dropdown_top.value == 'Ethereum':
         update_top_source(df_eth)
+
+
+# In[97]:
 
 def update_bottom_plot(attrname, old, new):
     '''Update bottom plot to selected data set'''
@@ -651,21 +759,18 @@ dropdown_top.on_change('value', update_top_plot)
 dropdown_bottom.on_change('value', update_bottom_plot)
 
 
-# In[365]:
+# In[98]:
 
 #Format layout and display plot
-button_controls = row([button_3m, button_6m, button_1y, button_ytd, button_all, Spacer(width=50), checkbox_button_group])
-dropdown_and_tables = column(column(dropdown_top, dropdown_bottom), data_table)
-top_row = row(corr_plot, dropdown_and_tables)
-price_plots = column(column(button_controls, top_plot), bottom_plot)
+button_controls = row([button_1m, button_3m, button_6m, button_1y, button_ytd, button_all, Spacer(width=50), 
+                       checkbox_button_group])
+tables = row(y_table, Spacer(width = 20), column(x_table))
+dropdown_and_tables = column(row(dropdown_top, Spacer(width = 15), dropdown_bottom, Spacer(width = 50)), tables)
+top_row = row(corr_plot, column(Spacer(height = 25, width = 0), data_table), Spacer(width = 20), dropdown_and_tables)
+price_plots = column(column(button_controls, top_plot, bottom_plot))
 
 output_file("dashboard.html", title="dashboard.py")
 layout = column(top_row, price_plots)
 curdoc().add_root(layout)
 show(layout)
-
-
-# In[ ]:
-
-
 
