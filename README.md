@@ -5,11 +5,11 @@ We used the cryptocurrency index Crix as the market: http://crix.hu-berlin.de/
 
 We have build a simple dashboard showing the metrics after running a simple linear regression between cryptocurrencies as seen below:
 
-![Linear Regression]('Images/Simple-Analysis.png')
+![Linear Regression]('https://github.com/chrishyland/Crypto-position/blob/master/Images/Simple-Analysis.png')
 
 We have also built an Ichimoku plot alongisde candle stick charts:
 
-![Ichimoku]('Images/Ichimoku.png')
+![Ichimoku]('https://github.com/chrishyland/Crypto-position/blob/master/Images/Ichimoku.png')
 
 ## Requirements
 
