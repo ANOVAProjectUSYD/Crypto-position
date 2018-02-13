@@ -1,9 +1,7 @@
 # Cryptocurrency Technical Analysis
-This project seeks to scrape Cryptocurrency data from [coinmarketcap](https://coinmarketcap.com/) and into a CSV file. Then, we will run some technical analysis on the data. Common trading strategies include momentum, mean reversal, and more. We would also like to be able to create a visualiation
-dashboard to explore the data. We then would include this on our ANOVA github page.
-We used the cryptocurrency index Crix as the market: http://crix.hu-berlin.de/
+This project seeks to scrape Cryptocurrency data from [coinmarketcap](https://coinmarketcap.com/).
 
-We have build a simple dashboard showing the metrics after running a simple linear regression between cryptocurrencies as seen below:
+Then, we have built a dashboard computing the metrics after running a simple linear regression between cryptocurrencies as seen below:
 
 ![Linear Regression](Images/Simple-Analysis.png?raw=true)
 
@@ -11,6 +9,18 @@ We have also built an Ichimoku plot alongisde candle stick charts:
 
 ![Ichimoku](Images/Ichimoku.png?raw=true)
 
+Current cryptocurrency this dashboard has includes:
+* Bitcoin
+* Ethereum
+* Ripple
+* Monero
+* Litecoin
+* Cardano
+* Neo
+
+We used the cryptocurrency index Crix as the market: http://crix.hu-berlin.de/
+
+Final result is here: https://tech-analysis-plots.herokuapp.com/Tech-analysis-plots
 
 ## Requirements
 
@@ -29,12 +39,7 @@ bokeh serve --show Tech-analysis-plots.py
 ```
 
 Voila! Your beautiful crypto dashboard should be up and running.
-
-
-Heroku:
-
-Account: admin@anovaprojectusyd.org
-password: Anovaproject2003
+<!--
 ### PostgreSQL Local Setup
 
 Installation: The easiest way to install is either by __homebrew__ or http://postgresapp.com/ (for Mac Users) Note that you can install any version you want since we will use Heroku in the end.
@@ -69,7 +74,7 @@ __Migration Repository__: This is a directory that stores scripts that are creat
 - `flask db upgrade`: Apply the changes
 - `flask db downgrade`: Undo the last migration.
 
-Playing with SQLAlchemy: The documentation is really useful and clear http://flask-sqlalchemy.pocoo.org/2.3/. Also, we can use `flask shell` which is similar to python shell but we can pre-import objects from the app file.
+Playing with SQLAlchemy: The documentation is really useful and clear http://flask-sqlalchemy.pocoo.org/2.3/. Also, we can use `flask shell` which is similar to python shell but we can pre-import objects from the app file. -->
 
 
 ## Metrics used
