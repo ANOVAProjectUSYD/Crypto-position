@@ -2,6 +2,16 @@
 This project seeks to scrape Cryptocurrency data from [coinmarketcap](https://coinmarketcap.com/) and into a CSV file. Then, we will run some technical analysis on the data. Common trading strategies include momentum, mean reversal, and more. We would also like to be able to create a visualiation
 dashboard to explore the data. We then would include this on our ANOVA github page.
 We used the cryptocurrency index Crix as the market: http://crix.hu-berlin.de/
+
+We have build a simple dashboard showing the metrics after running a simple linear regression between cryptocurrencies as seen below:
+
+![Linear Regression](Images/Simple-Analysis.png?raw=true)
+
+We have also built an Ichimoku plot alongisde candle stick charts:
+
+![Ichimoku](Images/Ichimoku.png?raw=true)
+
+
 ## Requirements
 
 Python3 is required. All packages used are in the requirements.txt file.
@@ -12,22 +22,19 @@ From that, just run venv as you would normally would for the virtual environment
 To run the Bokeh code on their servers, just go: bokeh serve --show Tech-analysis.plots.py
 ### Getting Started
 
-Most likely to use plotly to construct the dashboard: https://plot.ly/
+To run this dashboard, simply clone this repo. Afterwards, after ensuring you all the required packages, then you can simply run:
 
-Examples of good dashboards: https://plot.ly/dash/gallery/uber-rides/
+```bash
+bokeh serve --show Tech-analysis-plots.py
+```
 
-First let's get this working on our own Jupyter notebooks.
+Voila! Your beautiful crypto dashboard should be up and running.
 
-Good tutorial to learn git: https://www.atlassian.com/git/tutorials
 
-Tutorial used to build with Flask is:http://adilmoujahid.com/posts/2015/01/interactive-data-visualization-d3-dc-python-mongodb/
+Heroku:
 
-Code for Flask is inside the project directory.
-
-Additional Flask Tutorials:
-- https://realpython.com/blog/python/flask-by-example-part-1-project-setup/
-- https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
-
+Account: admin@anovaprojectusyd.org
+password: Anovaproject2003
 ### PostgreSQL Local Setup
 
 Installation: The easiest way to install is either by __homebrew__ or http://postgresapp.com/ (for Mac Users) Note that you can install any version you want since we will use Heroku in the end.
