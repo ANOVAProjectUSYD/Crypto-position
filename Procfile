@@ -1,0 +1,1 @@
+web: bokeh serve --port=$PORT --num-procs=0 --host=tech-analysis-plots.herokuapp.com --address=0.0.0.0 --use-xheaders Tech-analysis-plots.py
