@@ -160,11 +160,11 @@ df_neo = scale_volume(df_neo, 50000000)
 
 cardano = pd.read_csv('https://raw.githubusercontent.com/chrishyland/Crypto-position/master/Dataset/cardano_final.csv')
 df_car = reverse_date(cardano, "No")
-df_car = scale_volume(df_car, 8000000000)
+df_car = scale_volume(df_car, 10000000000)
 
 monero = pd.read_csv('https://raw.githubusercontent.com/chrishyland/Crypto-position/master/Dataset/monero_final.csv')
 df_mon = reverse_date(monero, "No")
-df_mon = scale_volume(df_car, 50000000)
+df_mon = scale_volume(df_mon, 8000000)
 
 # For market index.
 df_market = pd.read_csv('https://raw.githubusercontent.com/chrishyland/Crypto-position/master/Dataset/crix.csv')
