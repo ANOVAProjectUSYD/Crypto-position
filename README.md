@@ -1,7 +1,7 @@
 # Cryptocurrency Technical Analysis
-This project seeks to scrape Cryptocurrency data from [coinmarketcap](https://coinmarketcap.com/) and into a CSV file. Then, we will run some technical analysis on the data. Common trading strategies include momentum, mean reversal, and more. We would also like to be able to create a visualiation
-dashboard to explore the data. We then would include this on our ANOVA github page.
-We used the cryptocurrency index Crix as the market: http://crix.hu-berlin.de/
+This project scraped Cryptocurrency data from [coinmarketcap](https://coinmarketcap.com/) and into a CSV file. Then, we ran some trading technical analysis on the data. Common trading strategies include momentum, mean reversal, and more. We then created a visualiation dashboard to explore the data using Bokeh. We used the cryptocurrency index Crix as the market in which to benchmark the currencies against.
+
+The link to the dashboard is deployed on Heroku [here](https://tech-analysis-plots.herokuapp.com/Tech-analysis-plots).
 
 We have build a simple dashboard showing the metrics after running a simple linear regression between cryptocurrencies as seen below:
 
@@ -20,6 +20,8 @@ If you are using Mac OSX and a virtualenv, the files for Bokeh plots will not ru
 From that, just run venv as you would normally would for the virtual environment.
 
 To run the Bokeh code on their servers, just go: bokeh serve --show Tech-analysis.plots.py
+
+
 ### Getting Started
 
 To run this dashboard, simply clone this repo. Afterwards, after ensuring you all the required packages, then you can simply run:
@@ -29,47 +31,6 @@ bokeh serve --show Tech-analysis-plots.py
 ```
 
 Voila! Your beautiful crypto dashboard should be up and running.
-
-
-Heroku:
-
-Account: admin@anovaprojectusyd.org
-password: Anovaproject2003
-### PostgreSQL Local Setup
-
-Installation: The easiest way to install is either by __homebrew__ or http://postgresapp.com/ (for Mac Users) Note that you can install any version you want since we will use Heroku in the end.
-
-Command Line Tools: Both options above come with the command line tools. Just be sure to include the bin in your PATH.
-
-Creating your local db:
-```
-mkdir /usr/local/var/postgres
-initdb
-```
-
-Starting your server manually: `pg_ctl -D /usr/local/var/postgres start`
-
-Now you can connect to the database (default one is postgres): `psql postgres` (a console should start).
-
-Create a new database through the console: `CREATE DATABASE <name> ;` (I named it _anova-crypto_.) Alternatively, you could use `createdb <name>` in your command line.
-
-From this point, you can play around now. For more references, you can include `--help` option in the command for more information.
-
-### Flask + SQLAlchemy + PostgreSQL
-
-Install __autoenv__ or similar tools if haven't already: This is particularly useful for development since we often deal with enviroments. They can automatically switch your virtual environment and define environment variables.
-
-Run Flask App via `flask run`. However, we need to set the `FLASK_APP` environment variable to the flask app file which is `app.py` in this case.
-
-We can create models (or tables) in `models.py`. Now we can actually create tables in the connected database from these predefined models. Note that the database you want to connect to can be set through `DATABASE_URL` environment variable but since I'm testing on my local machine, it's `postgresql://localhost/anova-crypto`.
-
-__Migration Repository__: This is a directory that stores scripts that are created whenever the database schema is changed. These scripts record the changes and can be applied to your database. This is useful when the database structure needs to be changed.
-- `flask db init`: Create the migration repository (already did here).
-- `flask db migrate`: Automatically generate the migration scripts.
-- `flask db upgrade`: Apply the changes
-- `flask db downgrade`: Undo the last migration.
-
-Playing with SQLAlchemy: The documentation is really useful and clear http://flask-sqlalchemy.pocoo.org/2.3/. Also, we can use `flask shell` which is similar to python shell but we can pre-import objects from the app file.
 
 
 ## Metrics used
